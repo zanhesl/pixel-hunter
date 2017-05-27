@@ -37,4 +37,4 @@ window.addEventListener(`keydown`, (evt) => {
   if (evt.altKey && evt.keyCode === keyRight) {
     showScreen(++screenIndex);
   }
-})
+});
