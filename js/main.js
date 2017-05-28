@@ -21,7 +21,11 @@ const getScreens = (ids) => {
 };
 
 const showScreen = (index) => {
-  viewport.replaceChild(screens[index], viewport.firstChild);
+  if (viewport.hasChildNodes()) {
+    viewport.replaceChild(screens[index], viewport.firstChild);
+  } else {
+    viewport.appendChild(screens[index]);
+  }
 };
 
 const shiftScreen = (offset = 0) => {
