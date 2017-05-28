@@ -1,40 +1,65 @@
 
-const screens = [
-  document.querySelector(`.central`).cloneNode(true),     // Экран загрузки
-  document.getElementById(`greeting`),                    // Приветственный экран
-  document.getElementById(`rules`),                       // Начало игры
-  document.getElementById(`game-1`),                      // Игровой шаг
-  document.getElementById(`game-2`),                      // Игровой шаг
-  document.getElementById(`game-3`),                      // Игровой шаг
-  document.getElementById(`stats`)                        // Результаты игры
+const screenIds = [
+  `loading`,     // Экран загрузки
+  `greeting`,    // Приветственный экран
+  `rules`,       // Начало игры
+  `game-1`,      // Игровой шаг
+  `game-2`,      // Игровой шаг
+  `game-3`,      // Игровой шаг
+  `stats`        // Результаты игры
 ];
 
-const viewport = document.querySelector(`.central`);
+const getScreens = (ids) => {
+  return ids.map((item) => {
+
+    const template = document.getElementById(item);
+
+    return (template.content)
+      ? template.content.querySelector(`.central`)
+      : template.querySelector(`.central`);
+  });
+};
 
 const showScreen = (index) => {
-
-  index = (index < 0)
-    ? -index % screens.length
-    : index % screens.length;
-
-  if (viewport && screens[index]) {
-    viewport.innerHTML = screens[index].innerHTML;
-  }
+  viewport.replaceChild(screens[index], viewport.firstChild);
 };
+
+const shiftScreen = (offset = 0) => {
+
+  screenIndex = ((screenIndex + offset) < 0)
+    ? screens.length - 1
+    : (screenIndex + offset) % screens.length;
+
+  showScreen(screenIndex);
+};
+
+const isAltLeftKeysDown = (evt) => {
+  const leftKey = 37;
+  return evt.altKey && evt.keyCode === leftKey;
+};
+
+const isAltRightKeysDown = (evt) => {
+  const rightKey = 39;
+  return evt.altKey && evt.keyCode === rightKey;
+};
+
+
+const viewport = document.querySelector(`.viewport`);
+const screens = getScreens(screenIds);
 
 let screenIndex = 0;
 
+
 showScreen(screenIndex);
 
-window.addEventListener(`keydown`, (evt) => {
-  const keyLeft = 37;
-  const keyRight = 39;
 
-  if (evt.altKey && evt.keyCode === keyLeft) {
-    showScreen(--screenIndex);
+window.addEventListener(`keydown`, (evt) => {
+
+  if (isAltLeftKeysDown(evt)) {
+    shiftScreen(-1);
   }
 
-  if (evt.altKey && evt.keyCode === keyRight) {
-    showScreen(++screenIndex);
+  if (isAltRightKeysDown(evt)) {
+    shiftScreen(1);
   }
 });
