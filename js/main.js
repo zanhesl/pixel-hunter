@@ -1,14 +1,4 @@
 
-const screenIds = [
-  `loading`,     // Экран загрузки
-  `greeting`,    // Приветственный экран
-  `rules`,       // Начало игры
-  `game-1`,      // Игровой шаг
-  `game-2`,      // Игровой шаг
-  `game-3`,      // Игровой шаг
-  `stats`        // Результаты игры
-];
-
 const getScreens = (ids) => {
   return ids.map((item) => {
 
@@ -19,6 +9,33 @@ const getScreens = (ids) => {
       : template.querySelector(`.central`);
   });
 };
+
+const isAltLeftKeysDown = (evt) => {
+  const leftKey = 37;
+  return evt.altKey && evt.keyCode === leftKey;
+};
+
+const isAltRightKeysDown = (evt) => {
+  const rightKey = 39;
+  return evt.altKey && evt.keyCode === rightKey;
+};
+
+
+const screenIds = [
+  `loading`,     // Экран загрузки
+  `greeting`,    // Приветственный экран
+  `rules`,       // Начало игры
+  `game-1`,      // Игровой шаг
+  `game-2`,      // Игровой шаг
+  `game-3`,      // Игровой шаг
+  `stats`        // Результаты игры
+];
+
+const viewport = document.querySelector(`.viewport`);
+const screens = getScreens(screenIds);
+
+let screenIndex = 0;
+
 
 const showScreen = (index) => {
   if (viewport.hasChildNodes()) {
@@ -36,22 +53,6 @@ const shiftScreen = (offset = 0) => {
 
   showScreen(screenIndex);
 };
-
-const isAltLeftKeysDown = (evt) => {
-  const leftKey = 37;
-  return evt.altKey && evt.keyCode === leftKey;
-};
-
-const isAltRightKeysDown = (evt) => {
-  const rightKey = 39;
-  return evt.altKey && evt.keyCode === rightKey;
-};
-
-
-const viewport = document.querySelector(`.viewport`);
-const screens = getScreens(screenIds);
-
-let screenIndex = 0;
 
 
 showScreen(screenIndex);
