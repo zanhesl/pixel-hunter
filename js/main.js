@@ -1,14 +1,11 @@
+import introElement from './intro';
+import greetingElement from './greeting';
+import rulesElement from './rules';
+import gameOneElement from './game-1';
+import gameTwoElement from './game-2';
+import gameThreeElement from './game-3';
+import statsElement from './stats';
 
-const getScreens = (ids) => {
-  return ids.map((item) => {
-
-    const template = document.getElementById(item);
-
-    return (template.content)
-      ? template.content.querySelector(`.central`)
-      : template.querySelector(`.central`);
-  });
-};
 
 const isAltLeftKeysDown = (evt) => {
   const leftKey = 37;
@@ -21,18 +18,17 @@ const isAltRightKeysDown = (evt) => {
 };
 
 
-const screenIds = [
-  `loading`,     // Экран загрузки
-  `greeting`,    // Приветственный экран
-  `rules`,       // Начало игры
-  `game-1`,      // Игровой шаг
-  `game-2`,      // Игровой шаг
-  `game-3`,      // Игровой шаг
-  `stats`        // Результаты игры
-];
-
 const viewport = document.querySelector(`.viewport`);
-const screens = getScreens(screenIds);
+
+const screens = [
+  introElement,
+  greetingElement,
+  rulesElement,
+  gameOneElement,
+  gameTwoElement,
+  gameThreeElement,
+  statsElement
+];
 
 let screenIndex = 0;
 
