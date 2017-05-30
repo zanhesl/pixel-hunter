@@ -1,11 +1,9 @@
 
-export function getElementFromTemplate(htmContent) {
+export function getElementFromTemplate(htmContent, wrapper) {
 
-  const parent = document.createElement(`section`);
+  wrapper = (wrapper) ? wrapper : document.createElement(`div`);
 
-  parent.classList.add(`central`);
+  wrapper.insertAdjacentHTML(`afterbegin`, htmContent);
 
-  parent.insertAdjacentHTML(`afterbegin`, htmContent);
-
-  return parent;
+  return wrapper;
 }

@@ -1,8 +1,9 @@
 
 import * as utils from './utils';
+import * as game from './game';
 
 
-const greetingTemplateMarkup = `\
+const template = `\
   <div class="greeting">
     <div class="greeting__logo"><img src="img/logo_big.png" width="201" height="89" alt="Pixel Hunter"></div>
     <h1 class="greeting__asterisk">*</h1>
@@ -27,6 +28,14 @@ const greetingTemplateMarkup = `\
     </div>
   </footer>`;
 
-const greetingElement = utils.getElementFromTemplate(greetingTemplateMarkup);
+const elementWrapper    = game.getScreenWrapper();
+const element           = utils.getElementFromTemplate(template, elementWrapper);
+const greetingContinue  = element.querySelector(`.greeting__continue`);
 
-export default greetingElement;
+
+greetingContinue.addEventListener(`click`, (evt) => {
+  game.showScreen(`rules`);
+});
+
+
+export default element;

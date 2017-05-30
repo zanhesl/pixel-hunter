@@ -1,8 +1,9 @@
 
 import * as utils from './utils';
+import * as game from './game';
 
 
-const gameThreeTemplateMarkup = `\
+const template = `\
   <header class="header">
     <div class="header__back">
       <span class="back">
@@ -56,6 +57,37 @@ const gameThreeTemplateMarkup = `\
     </div>
   </footer>`;
 
-const gameThreeElement = utils.getElementFromTemplate(gameThreeTemplateMarkup);
+const elementWrapper = game.getScreenWrapper();
+const element        = utils.getElementFromTemplate(template, elementWrapper);
+const gameContent    = element.querySelector(`.game__content`);
+const gameAnswers    = gameContent.querySelectorAll(`img`);
+const backButton     = element.querySelector(`.header__back`);
 
-export default gameThreeElement;
+
+Array.from(gameAnswers).forEach((answer) => {
+  answer.addEventListener(`click`, (evt) => {
+    console.log('go to stats!')
+  }, true);
+});
+
+function isAnswered(evt) {
+  return evt.currentTarget.classList.contains(`game__option`);
+}
+
+gameContent.addEventListener(`click`, (evt) => {
+  //game.showScreen(`stats`);
+
+  console.log('target:' + evt.target.tagName + ' curTarget:' + evt.currentTarget.tagName);
+
+  if (isAnswered(evt)) {
+    console.log('go to stats!')
+    //game.showScreen(`stats`);
+  }
+}, true);
+
+backButton.addEventListener(`click`, (evt) => {
+  game.showScreen(`greeting`);
+});
+
+
+export default element;

@@ -1,8 +1,9 @@
 
 import * as utils from './utils';
+import * as game from './game';
 
 
-const statsTemplateMarkup = `\
+const template = `\
   <header class="header">
     <div class="header__back">
       <span class="back">
@@ -122,6 +123,14 @@ const statsTemplateMarkup = `\
     </div>
   </footer>`;
 
-const statsElement = utils.getElementFromTemplate(statsTemplateMarkup);
+const elementWrapper = game.getScreenWrapper();
+const element        = utils.getElementFromTemplate(template, elementWrapper);
+const backButton     = element.querySelector(`.header__back`);
 
-export default statsElement;
+
+backButton.addEventListener(`click`, (evt) => {
+  game.showScreen(`greeting`);
+});
+
+
+export default element;

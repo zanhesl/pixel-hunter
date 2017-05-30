@@ -1,8 +1,9 @@
 
 import * as utils from './utils';
+import * as game from './game';
 
 
-const gameTwoTemplateMarkup = `\
+const template = `\
   <header class="header">
     <div class="header__back">
       <span class="back">
@@ -58,6 +59,31 @@ const gameTwoTemplateMarkup = `\
     </div>
   </footer>`;
 
-const gameTwoElement = utils.getElementFromTemplate(gameTwoTemplateMarkup);
+const elementWrapper = game.getScreenWrapper();
+const element        = utils.getElementFromTemplate(template, elementWrapper);
+const gameContent    = element.querySelector(`.game__content`);
+const questions      = [ `question1` ];
+const backButton     = element.querySelector(`.header__back`);
 
-export default gameTwoElement;
+
+function isAnswered(question) {
+
+  const answers = gameContent.elements[question];
+
+  return Array.from(answers).some((answer) => answer.checked);
+}
+
+
+gameContent.addEventListener(`click`, (evt) => {
+
+  if (questions.every((question) => isAnswered(question))) {
+    game.showScreen(`game-3`);
+  }
+});
+
+backButton.addEventListener(`click`, (evt) => {
+  game.showScreen(`greeting`);
+});
+
+
+export default element;

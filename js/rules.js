@@ -1,8 +1,9 @@
 
 import * as utils from './utils';
+import * as game from './game';
 
 
-const rulesTemplateMarkup = `\
+const template = `\
   <header class="header">
     <div class="header__back">
       <span class="back">
@@ -38,6 +39,24 @@ const rulesTemplateMarkup = `\
     </div>
   </footer>`;
 
-const rulesElement = utils.getElementFromTemplate(rulesTemplateMarkup);
+const elementWrapper = game.getScreenWrapper();
+const element        = utils.getElementFromTemplate(template, elementWrapper);
+const rulesForm      = element.querySelector(`.rules__form`);
+const rulesInput     = rulesForm.querySelector(`.rules__input`);
+const rulesButton    = rulesForm.querySelector(`.rules__button`);
+const backButton     = element.querySelector(`.header__back`);
 
-export default rulesElement;
+
+rulesForm.addEventListener(`submit`, (evt) => {
+  game.showScreen(`game-1`);
+});
+
+rulesInput.addEventListener(`input`, (evt) => {
+  rulesButton.disabled = (0 === rulesInput.value.length);
+});
+
+backButton.addEventListener(`click`, (evt) => {
+  game.showScreen(`greeting`);
+});
+
+export default element;

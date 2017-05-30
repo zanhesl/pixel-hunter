@@ -1,8 +1,9 @@
 
 import * as utils from './utils';
+import * as game from './game';
 
 
-const introTemplateMarkup = `\
+const template = `\
   <div id="main" class="central__content">
     <div id="intro" class="intro">
       <h1 class="intro__asterisk">*</h1>
@@ -20,6 +21,14 @@ const introTemplateMarkup = `\
     </div>
   </footer>`;
 
-const introElement = utils.getElementFromTemplate(introTemplateMarkup);
+const elementWrapper = game.getScreenWrapper();
+const element        = utils.getElementFromTemplate(template, elementWrapper);
+const introAsterisk  = element.querySelector(`.intro__asterisk`);
 
-export default introElement;
+
+introAsterisk.addEventListener(`click`, (evt) => {
+  game.showScreen(`greeting`);
+});
+
+
+export default element;
