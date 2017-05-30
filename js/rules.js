@@ -40,22 +40,23 @@ const template = `\
   </footer>`;
 
 const elementWrapper = game.getScreenWrapper();
-const element        = utils.getElementFromTemplate(template, elementWrapper);
-const rulesForm      = element.querySelector(`.rules__form`);
-const rulesInput     = rulesForm.querySelector(`.rules__input`);
-const rulesButton    = rulesForm.querySelector(`.rules__button`);
-const backButton     = element.querySelector(`.header__back`);
+const element = utils.getElementFromTemplate(template, elementWrapper);
+
+const rulesForm = element.querySelector(`.rules__form`);
+const rulesInput = rulesForm.querySelector(`.rules__input`);
+const rulesButton = rulesForm.querySelector(`.rules__button`);
+const backButton = element.querySelector(`.header__back`);
 
 
-rulesForm.addEventListener(`submit`, (evt) => {
+rulesForm.addEventListener(`submit`, () => {
   game.showScreen(`game-1`);
 });
 
-rulesInput.addEventListener(`input`, (evt) => {
-  rulesButton.disabled = (0 === rulesInput.value.length);
+rulesInput.addEventListener(`input`, () => {
+  rulesButton.disabled = (rulesInput.value.length === 0);
 });
 
-backButton.addEventListener(`click`, (evt) => {
+backButton.addEventListener(`click`, () => {
   game.showScreen(`greeting`);
 });
 

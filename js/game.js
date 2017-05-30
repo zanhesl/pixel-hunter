@@ -11,13 +11,13 @@ import statsElement from './stats';
 const viewport = document.querySelector(`.viewport`);
 
 const screens = {
-  'intro' : introElement,
-  'greeting' : greetingElement,
-  'rules' : rulesElement,
-  'game-1' : gameOneElement,
-  'game-2' : gameTwoElement,
-  'game-3' : gameThreeElement,
-  'stats' : statsElement
+  'intro': introElement,
+  'greeting': greetingElement,
+  'rules': rulesElement,
+  'game-1': gameOneElement,
+  'game-2': gameTwoElement,
+  'game-3': gameThreeElement,
+  'stats': statsElement
 };
 
 
@@ -32,9 +32,9 @@ export function getScreenWrapper() {
 
 export function showScreen(screenName) {
 
-  if (viewport.hasChildNodes()) {
-    viewport.replaceChild(screens[screenName], viewport.firstChild);
-  } else {
-    viewport.appendChild(screens[screenName]);
+  while (viewport.firstChild) {
+    viewport.removeChild(viewport.firstChild);
   }
+
+  viewport.appendChild(screens[screenName]);
 }

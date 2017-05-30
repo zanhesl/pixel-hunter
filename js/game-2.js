@@ -60,10 +60,11 @@ const template = `\
   </footer>`;
 
 const elementWrapper = game.getScreenWrapper();
-const element        = utils.getElementFromTemplate(template, elementWrapper);
-const gameContent    = element.querySelector(`.game__content`);
-const questions      = [ `question1` ];
-const backButton     = element.querySelector(`.header__back`);
+const element = utils.getElementFromTemplate(template, elementWrapper);
+
+const gameContent = element.querySelector(`.game__content`);
+const questions = [`question1`];
+const backButton = element.querySelector(`.header__back`);
 
 
 function isAnswered(question) {
@@ -74,14 +75,14 @@ function isAnswered(question) {
 }
 
 
-gameContent.addEventListener(`click`, (evt) => {
+gameContent.addEventListener(`click`, () => {
 
   if (questions.every((question) => isAnswered(question))) {
     game.showScreen(`game-3`);
   }
 });
 
-backButton.addEventListener(`click`, (evt) => {
+backButton.addEventListener(`click`, () => {
   game.showScreen(`greeting`);
 });
 

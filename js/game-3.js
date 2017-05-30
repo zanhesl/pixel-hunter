@@ -58,34 +58,21 @@ const template = `\
   </footer>`;
 
 const elementWrapper = game.getScreenWrapper();
-const element        = utils.getElementFromTemplate(template, elementWrapper);
-const gameContent    = element.querySelector(`.game__content`);
-const gameAnswers    = gameContent.querySelectorAll(`img`);
-const backButton     = element.querySelector(`.header__back`);
+const element = utils.getElementFromTemplate(template, elementWrapper);
+
+const gameContent = element.querySelector(`.game__content`);
+const gameAnswers = gameContent.querySelectorAll(`.game__option`);
+const backButton = element.querySelector(`.header__back`);
 
 
 Array.from(gameAnswers).forEach((answer) => {
-  answer.addEventListener(`click`, (evt) => {
-    console.log('go to stats!')
-  }, true);
+  answer.addEventListener(`click`, () => {
+    game.showScreen(`stats`);
+  });
 });
 
-function isAnswered(evt) {
-  return evt.currentTarget.classList.contains(`game__option`);
-}
 
-gameContent.addEventListener(`click`, (evt) => {
-  //game.showScreen(`stats`);
-
-  console.log('target:' + evt.target.tagName + ' curTarget:' + evt.currentTarget.tagName);
-
-  if (isAnswered(evt)) {
-    console.log('go to stats!')
-    //game.showScreen(`stats`);
-  }
-}, true);
-
-backButton.addEventListener(`click`, (evt) => {
+backButton.addEventListener(`click`, () => {
   game.showScreen(`greeting`);
 });
 

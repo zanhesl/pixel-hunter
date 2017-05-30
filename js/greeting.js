@@ -28,12 +28,13 @@ const template = `\
     </div>
   </footer>`;
 
-const elementWrapper    = game.getScreenWrapper();
-const element           = utils.getElementFromTemplate(template, elementWrapper);
-const greetingContinue  = element.querySelector(`.greeting__continue`);
+const elementWrapper = game.getScreenWrapper();
+const element = utils.getElementFromTemplate(template, elementWrapper);
+
+const greetingContinue = element.querySelector(`.greeting__continue`);
 
 
-greetingContinue.addEventListener(`click`, (evt) => {
+greetingContinue.addEventListener(`click`, () => {
   game.showScreen(`rules`);
 });
 

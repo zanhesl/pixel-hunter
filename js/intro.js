@@ -22,11 +22,12 @@ const template = `\
   </footer>`;
 
 const elementWrapper = game.getScreenWrapper();
-const element        = utils.getElementFromTemplate(template, elementWrapper);
-const introAsterisk  = element.querySelector(`.intro__asterisk`);
+const element = utils.getElementFromTemplate(template, elementWrapper);
+
+const introAsterisk = element.querySelector(`.intro__asterisk`);
 
 
-introAsterisk.addEventListener(`click`, (evt) => {
+introAsterisk.addEventListener(`click`, () => {
   game.showScreen(`greeting`);
 });
 

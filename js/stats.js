@@ -124,11 +124,12 @@ const template = `\
   </footer>`;
 
 const elementWrapper = game.getScreenWrapper();
-const element        = utils.getElementFromTemplate(template, elementWrapper);
-const backButton     = element.querySelector(`.header__back`);
+const element = utils.getElementFromTemplate(template, elementWrapper);
+
+const backButton = element.querySelector(`.header__back`);
 
 
-backButton.addEventListener(`click`, (evt) => {
+backButton.addEventListener(`click`, () => {
   game.showScreen(`greeting`);
 });
 
