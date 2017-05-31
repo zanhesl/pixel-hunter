@@ -1,6 +1,7 @@
 
 import * as utils from './utils';
 import * as game from './game';
+import greetingScreen from './greeting';
 
 
 const template = `\
@@ -123,14 +124,13 @@ const template = `\
     </div>
   </footer>`;
 
-const elementWrapper = game.getScreenWrapper();
-const element = utils.getElementFromTemplate(template, elementWrapper);
+const element = utils.getScreenFromTemplate(template);
 
 const backButton = element.querySelector(`.header__back`);
 
 
 backButton.addEventListener(`click`, () => {
-  game.showScreen(`greeting`);
+  game.renderScreen(greetingScreen);
 });
 
 

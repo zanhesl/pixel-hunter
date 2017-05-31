@@ -1,8 +1,9 @@
 
-export function getElementFromTemplate(htmContent, wrapper) {
+export function getScreenFromTemplate(htmContent) {
 
-  wrapper = (wrapper) ? wrapper : document.createElement(`div`);
+  const wrapper = document.createElement(`section`);
 
+  wrapper.classList.add(`central`);
   wrapper.insertAdjacentHTML(`afterbegin`, htmContent);
 
   return wrapper;

@@ -1,6 +1,8 @@
 
 import * as utils from './utils';
 import * as game from './game';
+import gameOneScreen from './game-1';
+import greetingScreen from './greeting';
 
 
 const template = `\
@@ -39,8 +41,7 @@ const template = `\
     </div>
   </footer>`;
 
-const elementWrapper = game.getScreenWrapper();
-const element = utils.getElementFromTemplate(template, elementWrapper);
+const element = utils.getScreenFromTemplate(template);
 
 const rulesForm = element.querySelector(`.rules__form`);
 const rulesInput = rulesForm.querySelector(`.rules__input`);
@@ -49,7 +50,7 @@ const backButton = element.querySelector(`.header__back`);
 
 
 rulesForm.addEventListener(`submit`, () => {
-  game.showScreen(`game-1`);
+  game.renderScreen(gameOneScreen);
 });
 
 rulesInput.addEventListener(`input`, () => {
@@ -57,7 +58,7 @@ rulesInput.addEventListener(`input`, () => {
 });
 
 backButton.addEventListener(`click`, () => {
-  game.showScreen(`greeting`);
+  game.renderScreen(greetingScreen);
 });
 
 export default element;

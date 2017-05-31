@@ -1,6 +1,8 @@
 
 import * as utils from './utils';
 import * as game from './game';
+import statsScreen from './stats';
+import greetingScreen from './greeting';
 
 
 const template = `\
@@ -57,8 +59,7 @@ const template = `\
     </div>
   </footer>`;
 
-const elementWrapper = game.getScreenWrapper();
-const element = utils.getElementFromTemplate(template, elementWrapper);
+const element = utils.getScreenFromTemplate(template);
 
 const gameContent = element.querySelector(`.game__content`);
 const gameAnswers = gameContent.querySelectorAll(`.game__option`);
@@ -67,13 +68,13 @@ const backButton = element.querySelector(`.header__back`);
 
 Array.from(gameAnswers).forEach((answer) => {
   answer.addEventListener(`click`, () => {
-    game.showScreen(`stats`);
+    game.renderScreen(statsScreen);
   });
 });
 
 
 backButton.addEventListener(`click`, () => {
-  game.showScreen(`greeting`);
+  game.renderScreen(greetingScreen);
 });
 
 

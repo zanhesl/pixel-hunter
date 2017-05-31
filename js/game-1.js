@@ -1,6 +1,8 @@
 
 import * as utils from './utils';
 import * as game from './game';
+import greetingScreen from './greeting';
+import gameTwoScreen from './game-2';
 
 
 const template = `\
@@ -70,8 +72,7 @@ const template = `\
     </div>
   </footer>`;
 
-const elementWrapper = game.getScreenWrapper();
-const element = utils.getElementFromTemplate(template, elementWrapper);
+const element = utils.getScreenFromTemplate(template);
 
 const gameContent = element.querySelector(`.game__content`);
 const questions = [`question1`, `question2`];
@@ -89,12 +90,12 @@ function isAnswered(question) {
 gameContent.addEventListener(`click`, () => {
 
   if (questions.every((question) => isAnswered(question))) {
-    game.showScreen(`game-2`);
+    game.renderScreen(gameTwoScreen);
   }
 });
 
 backButton.addEventListener(`click`, () => {
-  game.showScreen(`greeting`);
+  game.renderScreen(greetingScreen);
 });
 
 

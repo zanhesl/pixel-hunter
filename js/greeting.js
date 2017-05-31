@@ -1,6 +1,7 @@
 
 import * as utils from './utils';
 import * as game from './game';
+import rulesScreen from './rules';
 
 
 const template = `\
@@ -28,14 +29,13 @@ const template = `\
     </div>
   </footer>`;
 
-const elementWrapper = game.getScreenWrapper();
-const element = utils.getElementFromTemplate(template, elementWrapper);
+const element = utils.getScreenFromTemplate(template);
 
 const greetingContinue = element.querySelector(`.greeting__continue`);
 
 
 greetingContinue.addEventListener(`click`, () => {
-  game.showScreen(`rules`);
+  game.renderScreen(rulesScreen);
 });
 
 

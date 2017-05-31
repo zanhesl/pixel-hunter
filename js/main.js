@@ -1,3 +1,5 @@
-import * as game from './game';
 
-game.showScreen(`intro`);
+import * as game from './game';
+import introScreen from './intro';
+
+game.renderScreen(introScreen);
