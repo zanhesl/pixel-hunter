@@ -14,13 +14,16 @@ const template = `\
   </div>
   ${footer()}`;
 
-const element = utils.getScreenFromTemplate(template);
-const introAsterisk = element.querySelector(`.intro__asterisk`);
+
+export default () => {
+
+  const element = utils.getScreenFromTemplate(template);
+  const introAsterisk = element.querySelector(`.intro__asterisk`);
 
 
-introAsterisk.addEventListener(`click`, () => {
-  game.renderScreen(greetingScreen);
-});
+  introAsterisk.addEventListener(`click`, () => {
+    game.renderScreen(greetingScreen());
+  });
 
-
-export default element;
+  return element;
+};

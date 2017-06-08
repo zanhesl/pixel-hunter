@@ -12,11 +12,11 @@ export default (state) => `\
     </div>
     <h1 class="game__timer">NN</h1>
     <div class="game__lives">
-      ${new Array(game.MAX_LIVES - state.lives)
-          .fill(`<img src="img/heart__empty.svg" class="game__heart" alt="Life" width="32" height="32">`)
-          .join(``)}
+      ${new Array(game.rules.maxLives - state.lives)
+        .fill(`<img src="img/heart__empty.svg" class="game__heart" alt="Life" width="32" height="32">`)
+        .join(``)}
       ${new Array(state.lives)
-          .fill(`<img src="img/heart__full.svg" class="game__heart" alt="Life" width="32" height="32">`)
-          .join(``)}
+        .fill(`<img src="img/heart__full.svg" class="game__heart" alt="Life" width="32" height="32">`)
+        .join(``)}
     </div>
   </header>`;

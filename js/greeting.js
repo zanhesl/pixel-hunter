@@ -2,6 +2,7 @@
 import * as utils from './utils';
 import * as game from './game';
 import footer from './footer';
+
 import rulesScreen from './rules';
 
 
@@ -21,14 +22,16 @@ const template = `\
   </div>
   ${footer()}`;
 
-const element = utils.getScreenFromTemplate(template);
+export default () => {
 
-const greetingContinue = element.querySelector(`.greeting__continue`);
+  const element = utils.getScreenFromTemplate(template);
 
-
-greetingContinue.addEventListener(`click`, () => {
-  game.renderScreen(rulesScreen);
-});
+  const greetingContinue = element.querySelector(`.greeting__continue`);
 
 
-export default element;
+  greetingContinue.addEventListener(`click`, () => {
+    game.renderScreen(rulesScreen());
+  });
+
+  return element;
+};

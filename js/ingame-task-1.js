@@ -1,19 +1,15 @@
 
 import * as utils from './utils';
 import * as game from './game';
-import * as data from './data';
 
-import header from './ingame-header';
+import ingameHeader from './ingame-header';
 import stats from './ingame-stats';
 import footer from './footer';
 
-import greetingScreen from './greeting';
-import gameTwoScreen from './ingame-task-2';
 
-
-const templateGameOption = (index, img) => `\
+const templateGameOption = (option, index) => `\
   <div class="game__option">
-    <img src="${img}" alt="Option ${index}" width="468" height="458">
+    <img src="${option.img}" alt="Option ${index}" width="468" height="458">
     <label class="game__answer game__answer--photo">
       <input name="question${index}" type="radio" value="photo">
       <span>Фото</span>
@@ -24,69 +20,50 @@ const templateGameOption = (index, img) => `\
     </label>
   </div>`;
 
-const templateGame = (options) => `\
+const templateGame = (state, options) => `\
   <div class="game">
     <p class="game__task">Угадайте для каждого изображения фото или рисунок?</p>
     <form class="game__content">
-      <div class="game__option">
-        <img src="http://placehold.it/468x458" alt="Option 1" width="468" height="458">
-        <label class="game__answer game__answer--photo">
-          <input name="question1" type="radio" value="photo">
-          <span>Фото</span>
-        </label>
-        <label class="game__answer game__answer--paint">
-          <input name="question1" type="radio" value="paint">
-          <span>Рисунок</span>
-        </label>
-      </div>
-      <div class="game__option">
-        <img src="http://placehold.it/468x458" alt="Option 2" width="468" height="458">
-        <label class="game__answer  game__answer--photo">
-          <input name="question2" type="radio" value="photo">
-          <span>Фото</span>
-        </label>
-        <label class="game__answer  game__answer--paint">
-          <input name="question2" type="radio" value="paint">
-          <span>Рисунок</span>
-        </label>
-      </div>
+      ${options.map((option, index) => templateGameOption(option, index + 1)).join(``)}
     </form>
     <div class="stats">
-      ${stats(data.state.results)}
+      ${stats(state.results)}
     </div>
   </div>`;
 
-const template = (data) => `\
-  ${header(data.state)}
-  ${templateGame(data)}
+const template = (state, options) => `\
+  ${ingameHeader(state)}
+  ${templateGame(state, options)}
   ${footer()}`;
 
 
-const element = utils.getScreenFromTemplate(template(data));
-
-const gameContent = element.querySelector(`.game__content`);
 const questions = [`question1`, `question2`];
-const backButton = element.querySelector(`.header__back`);
 
 
-function isAnswered(question) {
+export default (state, options) => {
 
-  const answers = gameContent.elements[question];
+  const element = utils.getScreenFromTemplate(template(state, options));
 
-  return Array.from(answers).some((answer) => answer.checked);
-}
+  const gameContent = element.querySelector(`.game__content`);
 
-
-gameContent.addEventListener(`click`, () => {
-
-  if (questions.every((question) => isAnswered(question))) {
-    game.renderScreen(gameTwoScreen);
-  }
-});
-
-backButton.addEventListener(`click`, () => {
-  game.renderScreen(greetingScreen);
-});
+  const isAnswered = (question) => {
+    return Array.from(gameContent.elements[question])
+      .some((answer) => answer.checked);
+  };
 
 
-export default element;
+  gameContent.addEventListener(`click`, () => {
+    if (questions.every((question) => isAnswered(question))) {
+      game.renderNextLevel(state);
+    }
+  });
+
+
+  const backButton = element.querySelector(`.header__back`);
+
+  backButton.addEventListener(`click`, () => {
+    game.reset();
+  });
+
+  return element;
+};

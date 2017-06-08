@@ -1,18 +1,15 @@
 
 import * as utils from './utils';
 import * as game from './game';
-import * as data from './data';
 
 import header from './header';
-import stats from './ingame-stats';
+import ingameStats from './ingame-stats';
 import footer from './footer';
-
-import greetingScreen from './greeting';
 
 
 const countResults = (results, result) => {
   return results.filter((item) => item === result).length;
-}
+};
 
 const getPoints = (results) => {
 
@@ -20,8 +17,8 @@ const getPoints = (results) => {
     return game.isCorrectResult(result);
   }).length;
 
-  return count * game.POINTS_PER_RESULT;
-}
+  return count * game.rules.pointsPerResult;
+};
 
 
 const templateSpeedBonus = (count) => {
@@ -31,10 +28,10 @@ const templateSpeedBonus = (count) => {
       <td></td>
       <td class="result__extra">Бонус за скорость:</td>
       <td class="result__extra">${count}&nbsp;<span class="stats__result stats__result--fast"></span></td>
-      <td class="result__points">×&nbsp;${game.SPEED_BONUS_POINTS}</td>
-      <td class="result__total">${count * game.SPEED_BONUS_POINTS}</td>
+      <td class="result__points">×&nbsp;${game.rules.speedBonusPoints}</td>
+      <td class="result__total">${count * game.rules.speedBonusPoints}</td>
     </tr>`;
-}
+};
 
 const templateLivesBonus = (count) => {
 
@@ -43,10 +40,10 @@ const templateLivesBonus = (count) => {
       <td></td>
       <td class="result__extra">Бонус за жизни:</td>
       <td class="result__extra">${count}&nbsp;<span class="stats__result stats__result--heart"></span></td>
-      <td class="result__points">×&nbsp;${game.LIVES_BONUS_POINTS}</td>
-      <td class="result__total">${count * game.LIVES_BONUS_POINTS}</td>
+      <td class="result__points">×&nbsp;${game.rules.livesBonusPoints}</td>
+      <td class="result__total">${count * game.rules.livesBonusPoints}</td>
     </tr>`;
-}
+};
 
 const templateSpeedPenalty = (count) => {
 
@@ -55,14 +52,14 @@ const templateSpeedPenalty = (count) => {
       <td></td>
       <td class="result__extra">Штраф за медлительность:</td>
       <td class="result__extra">${count}&nbsp;<span class="stats__result stats__result--slow"></span></td>
-      <td class="result__points">×&nbsp;${-game.SPEED_PENALTY_POINTS}</td>
-      <td class="result__total">${count * game.SPEED_PENALTY_POINTS}</td>
+      <td class="result__points">×&nbsp;${-game.rules.speedPenaltyPoints}</td>
+      <td class="result__total">${count * game.rules.speedPenaltyPoints}</td>
     </tr>`;
-}
+};
 
 const templateTableResults = (index, results) => {
 
-  const livesCount = (game.MAX_LIVES - countResults(results, `wrong`));
+  const livesCount = (game.rules.maxLives - countResults(results, `wrong`));
 
   let templateTableStat = ``;
   let templateTableExtra = ``;
@@ -77,15 +74,15 @@ const templateTableResults = (index, results) => {
     let totalPoints = getPoints(results);
 
     templateTableStat = `\
-      <td class="result__points">×&nbsp;${game.POINTS_PER_RESULT}</td>
+      <td class="result__points">×&nbsp;${game.rules.pointsPerResult}</td>
       <td class="result__total">${totalPoints}</td>`;
 
     const speedBonusCounts = countResults(results, `fast`);
     const speedPenaltyCounts = countResults(results, `slow`);
 
-    totalPoints += livesCount * game.LIVES_BONUS_POINTS +
-      speedBonusCounts * game.SPEED_BONUS_POINTS +
-      speedPenaltyCounts * game.SPEED_PENALTY_POINTS;
+    totalPoints += livesCount * game.rules.livesBonusPoints +
+      speedBonusCounts * game.rules.speedBonusPoints +
+      speedPenaltyCounts * game.rules.speedPenaltyPoints;
 
     templateTableExtra = `\
       ${templateSpeedBonus(speedBonusCounts)}
@@ -101,35 +98,38 @@ const templateTableResults = (index, results) => {
       <tr>
         <td class="result__number">${index}.</td>
         <td colspan="2">
-          ${stats(results)}
+          ${ingameStats(results)}
         </td>
         ${templateTableStat}
       </tr>
       ${templateTableExtra}
     </table>`;
-}
+};
 
 const templateResults = (stats) => `\
   <div class="result">
     <h1>Победа!</h1>
     ${stats.map((stat, index) => {
-      return templateTableResults(index + 1, stat.results)
+      return templateTableResults(index + 1, stat.results);
     }).join(``)}
   </div>`;
 
-const template = (data) => `\
+const template = (stats) => `\
   ${header()}
-  ${templateResults(data.stats)}
+  ${templateResults(stats)}
   ${footer()}`;
 
-const element = utils.getScreenFromTemplate(template(data));
 
-const backButton = element.querySelector(`.header__back`);
+export default (stats) => {
 
+  const element = utils.getScreenFromTemplate(template(stats));
 
-backButton.addEventListener(`click`, () => {
-  game.renderScreen(greetingScreen);
-});
+  const backButton = element.querySelector(`.header__back`);
 
 
-export default element;
+  backButton.addEventListener(`click`, () => {
+    game.reset();
+  });
+
+  return element;
+};
