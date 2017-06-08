@@ -8,3 +8,13 @@ export function getScreenFromTemplate(htmContent) {
 
   return wrapper;
 }
+
+export function geElementFromTemplate(htmContent) {
+
+  const wrapper = document.createElement(`template`);
+
+  wrapper.innerHTML = htmContent;
+
+  return wrapper.content;
+}
+
