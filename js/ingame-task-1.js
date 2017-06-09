@@ -9,7 +9,7 @@ import footer from './footer';
 
 const templateGameOption = (option, index) => `\
   <div class="game__option">
-    <img src="${option.img}" alt="Option ${index}" width="468" height="458">
+    <img alt="Option ${index}" data-src="${option.src}">
     <label class="game__answer game__answer--photo">
       <input name="question${index}" type="radio" value="photo">
       <span>Фото</span>
@@ -24,7 +24,7 @@ const templateGame = (state, options) => `\
   <div class="game">
     <p class="game__task">Угадайте для каждого изображения фото или рисунок?</p>
     <form class="game__content">
-      ${options.map((option, index) => templateGameOption(option, index + 1)).join(``)}
+      ${options.map((option, index) => { return templateGameOption(option, index + 1); }).join(``) }
     </form>
     <div class="stats">
       ${stats(state.results)}
@@ -36,8 +36,9 @@ const template = (state, options) => `\
   ${templateGame(state, options)}
   ${footer()}`;
 
-
 const questions = [`question1`, `question2`];
+const IMG_WIDTH = 468;
+const IMG_HEIGHT = 458;
 
 
 export default (state, options) => {
@@ -45,6 +46,9 @@ export default (state, options) => {
   const element = utils.getScreenFromTemplate(template(state, options));
 
   const gameContent = element.querySelector(`.game__content`);
+  const gameImages = gameContent.querySelectorAll(`img`);
+
+  utils.loadImages(gameContent, IMG_WIDTH, IMG_HEIGHT);
 
   const isAnswered = (question) => {
     return Array.from(gameContent.elements[question])

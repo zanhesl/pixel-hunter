@@ -43,7 +43,7 @@ export default () => {
   rulesForm.addEventListener(`submit`, (evt) => {
     evt.preventDefault();
 
-    game.renderLevel(Object.assign({}, game.initialState, {'name': rulesInput.value}));
+    game.start(rulesInput.value);
   });
 
   rulesInput.addEventListener(`input`, () => {

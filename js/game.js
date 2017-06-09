@@ -41,7 +41,7 @@ export const initialState = Object.freeze({
   level: 0,
   lives: rules.maxLives,
   name: ``,
-  results: new Array(levels.length).fill(`unknown`)
+  results: Object.freeze(new Array(rules.numberOfLevels).fill(`unknown`))
 });
 
 const taskTypes = {
@@ -91,6 +91,14 @@ export function renderNextLevel(state) {
 
     renderScreen(statsScreen(stats));
   }
+}
+
+export function start(userName = `Unknown`) {
+  renderLevel(Object.assign({},
+    initialState, {
+      'name': userName,
+      'results': initialState.results.slice(0)
+    }));
 }
 
 export function reset() {

@@ -9,7 +9,7 @@ import footer from './footer';
 
 const templateGameOption = (option, index) => `\
   <div class="game__option">
-    <img src="${option.img}" alt="Option ${index}" width="705" height="455">
+    <img alt="Option ${index}" data-src="${option.src}">
     <label class="game__answer game__answer--photo">
       <input name="question${index}" type="radio" value="photo">
       <span>Фото</span>
@@ -38,6 +38,8 @@ const template = (state, options) => `\
 
 
 const questions = [`question1`];
+const IMG_WIDTH = 705;
+const IMG_HEIGHT = 455;
 
 
 export default (state, options) => {
@@ -45,6 +47,8 @@ export default (state, options) => {
   const element = utils.getScreenFromTemplate(template(state, options));
 
   const gameContent = element.querySelector(`.game__content`);
+
+  utils.loadImages(gameContent, IMG_WIDTH, IMG_HEIGHT);
 
   const isAnswered = (question) => {
     return Array.from(gameContent.elements[question])

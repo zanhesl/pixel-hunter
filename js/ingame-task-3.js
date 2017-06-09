@@ -8,7 +8,7 @@ import footer from './footer';
 
 const templateGameOption = (option, index) => `\
   <div class="game__option">
-    <img src="${option.img}" alt="Option ${index}" width="304" height="455">
+    <img alt="Option ${index}" data-src="${option.src}" >
   </div>`;
 
 const templateGame = (state, options) => `\
@@ -27,6 +27,9 @@ const template = (state, options) => `\
   ${templateGame(state, options)}
   ${footer()}`;
 
+const IMG_WIDTH = 304;
+const IMG_HEIGHT = 455;
+
 
 export default (state, options) => {
 
@@ -34,6 +37,8 @@ export default (state, options) => {
 
   const gameContent = element.querySelector(`.game__content`);
   const gameAnswers = gameContent.querySelectorAll(`.game__option`);
+
+  utils.loadImages(gameContent, IMG_WIDTH, IMG_HEIGHT);
 
   Array.from(gameAnswers).forEach((answer) => {
     answer.addEventListener(`click`, () => {
