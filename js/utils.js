@@ -20,8 +20,8 @@ function scaleImage(img, width, height) {
   img.width = ((width / ratio) < height) ? width : height * ratio;
   img.height = ((width / ratio) < height) ? width / ratio : height;
 
-  //console.log(`Image upload ${imgWidth}:${imgHeight}(${imgWidth/imgHeight})`);
-  //console.log(`${img.width}:${img.height}(${img.width/img.height}) in ${width}:${height}(${width/height})`);
+  // console.log(`Image upload ${imgWidth}:${imgHeight}(${imgWidth/imgHeight})`);
+  // console.log(`${img.width}:${img.height}(${img.width/img.height}) in ${width}:${height}(${width/height})`);
 }
 
 function loadImage(src, width, height, callback) {
@@ -31,7 +31,7 @@ function loadImage(src, width, height, callback) {
 
   const image = new Image();
 
-  image.addEventListener('load', () => {
+  image.addEventListener(`load`, () => {
     clearTimeout(imageLoadTimeout);
 
     scaleImage(image, width, height);
@@ -39,8 +39,8 @@ function loadImage(src, width, height, callback) {
     callback(image);
   });
 
-  image.addEventListener('error', () => {
-    console.log(`Unable upload image: ${src}`)
+  image.addEventListener(`error`, () => {
+    // console.log(`Unable upload image: ${src}`);
   });
 
 

@@ -48,6 +48,7 @@ export default (state, options) => {
 
   const gameContent = element.querySelector(`.game__content`);
 
+
   utils.loadImages(gameContent, IMG_WIDTH, IMG_HEIGHT);
 
   const isAnswered = (question) => {

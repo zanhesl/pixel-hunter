@@ -95,10 +95,10 @@ export function renderNextLevel(state) {
 
 export function start(userName = `Unknown`) {
   renderLevel(Object.assign({},
-    initialState, {
-      'name': userName,
-      'results': initialState.results.slice(0)
-    }));
+      initialState, {
+        'name': userName,
+        'results': initialState.results.slice(0)
+      }));
 }
 
 export function reset() {

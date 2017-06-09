@@ -24,7 +24,7 @@ const templateGame = (state, options) => `\
   <div class="game">
     <p class="game__task">Угадайте для каждого изображения фото или рисунок?</p>
     <form class="game__content">
-      ${options.map((option, index) => { return templateGameOption(option, index + 1); }).join(``) }
+      ${options.map((option, index) => templateGameOption(option, index + 1)).join(``) }
     </form>
     <div class="stats">
       ${stats(state.results)}
@@ -46,7 +46,7 @@ export default (state, options) => {
   const element = utils.getScreenFromTemplate(template(state, options));
 
   const gameContent = element.querySelector(`.game__content`);
-  const gameImages = gameContent.querySelectorAll(`img`);
+
 
   utils.loadImages(gameContent, IMG_WIDTH, IMG_HEIGHT);
 
