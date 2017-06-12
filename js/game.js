@@ -1,5 +1,5 @@
 
-import levels from './levels';
+import levels from './data-levels';
 
 import ingameTask1 from './ingame-task-1';
 import ingameTask2 from './ingame-task-2';
@@ -9,96 +9,125 @@ import greetingScreen from './greeting';
 import statsScreen from './stats';
 
 
-export const rules = {
-  timePerLevel: 30,
-  slowTime: 25,
-  quickTime: 8,
-  pointsPerResult: 100,
-  speedBonusPoints: 50,
-  speedPenaltyPoints: -50,
-  livesBonusPoints: 50,
-  maxLives: 3,
-  numberOfLevels: levels.length
-};
-
-export const stats = [
-  {
-    name: `Mary`,
-    results: [`wrong`, `slow`, `fast`, `correct`, `wrong`, `unknown`, `slow`, `unknown`, `fast`, `unknown`]
-  }, {
-    name: `Finn`,
-    results: [`wrong`, `slow`, `fast`, `correct`, `wrong`, `unknown`, `slow`, `wrong`, `fast`, `wrong`]
-  }, {
-    name: `Alice`,
-    results: [`wrong`, `fast`, `fast`, `correct`, `wrong`, `unknown`, `slow`, `wrong`, `slow`, `slow`]
-  }, {
-    name: `Bob`,
-    results: [`correct`, `fast`, `correct`, `correct`, `fast`, `correct`, `correct`, `slow`, `correct`, `correct`]
-  }
-];
-
-export const initialState = Object.freeze({
-  level: 0,
-  lives: rules.maxLives,
-  name: ``,
-  results: Object.freeze(new Array(rules.numberOfLevels).fill(`unknown`))
-});
-
-const taskTypes = {
+const ingameTasks = Object.freeze({
   'task-1': ingameTask1,
   'task-2': ingameTask2,
   'task-3': ingameTask3
-};
+});
 
-const correctResults = new Set([`slow`, `fast`, `correct`]);
+let levelTimer = null;
 
-const viewport = document.querySelector(`.viewport`);
 
+export const rules = Object.freeze({
+  levelTime: 30,
+  slowTime: 20,
+  quickTime: 10,
+  points: Object.freeze({
+    correct: 100,
+    fast: 50,
+    slow: -50,
+    wrong: 0,
+    unknown: 0,
+    live: 50
+  }),
+  maxLives: 3,
+  levelsCount: levels.length
+});
+
+export const state = Object.freeze({
+  level: 0,
+  lives: rules.maxLives,
+  name: `Unknown`,
+  results: Object.freeze(new Array(rules.levelsCount).fill(`unknown`))
+});
 
 export function renderScreen(screen) {
+
+  const viewport = document.querySelector(`.viewport`);
+
   viewport.innerHTML = ``;
   viewport.appendChild(screen);
 }
 
-export function isCorrectResult(result) {
-  return correctResults.has(result);
+export function renderLevel(curState = state) {
+
+  const level = levels[curState.level];
+
+  renderScreen(ingameTasks[level.task](curState, level.options));
 }
 
-export function renderLevel(state) {
+export function renderNextLevel(curState = state) {
 
-  const type = levels[state.level].type;
-  const options = levels[state.level].options;
-
-  const screen = taskTypes[type](state, options);
-
-  renderScreen(screen);
-}
-
-export function renderNextLevel(state) {
-
-  state.level++;
-
-  if (state.level < rules.numberOfLevels) {
-
-    renderLevel(state);
-
+  if ((curState.lives >= 0) && (curState.level + 1) < rules.levelsCount) {
+    renderLevel(Object.assign({}, curState, {
+      level: curState.level + 1
+    }));
   } else {
-
-    stats.unshift({
-      name: state.name,
-      results: state.results
-    });
-
-    renderScreen(statsScreen(stats));
+    renderScreen(statsScreen(curState));
   }
 }
 
-export function start(userName = `Unknown`) {
-  renderLevel(Object.assign({},
-      initialState, {
-        'name': userName,
-        'results': initialState.results.slice(0)
-      }));
+export function applyLevelResults(curState = state, levelTime = 0, levelPassed = false) {
+
+  let results = `unknown`,
+    livePenalty = 0;
+
+  if (! levelPassed || levelTime <= 0) {
+    results = `wrong`;
+    livePenalty = 1;
+  } else if (levelPassed && levelTime <= rules.quickTime) {
+    results = `fast`;
+  } else if (levelPassed && levelTime >= rules.slowTime) {
+    results = `slow`;
+  } else if (levelPassed) {
+    results = `correct`;
+  }
+
+  const newState = Object.assign({}, curState, {
+    lives: curState.lives - livePenalty,
+    results: curState.results.slice()
+  });
+
+  newState.results[curState.level] = results;
+
+  return newState;
+}
+
+export function startLevel(curState = state, onLevelTime) {
+
+  const TIMER_DELAY = 1000;
+
+  let timerTiks = rules.levelTime;
+
+  levelTimer = setInterval(() => {
+
+    timerTiks--;
+
+    if (typeof onLevelTime === `function`) {
+      onLevelTime(timerTiks);
+    }
+
+    if (!timerTiks) {
+      clearInterval(levelTimer);
+      finishLevel(curState);
+    }
+
+  }, TIMER_DELAY);
+}
+
+export function finishLevel(curState = state, levelTime = 0, levelPassed = false) {
+
+  clearInterval(levelTimer);
+
+  renderNextLevel(applyLevelResults(curState, levelTime, levelPassed));
+}
+
+export function start(curState = state, userName = `Unknown`) {
+
+  renderLevel(Object.assign({}, curState, {
+    name: userName,
+    results: curState.results.slice()
+  }));
 }
 
 export function reset() {

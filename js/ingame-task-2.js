@@ -2,7 +2,7 @@
 import * as utils from './utils';
 import * as game from './game';
 
-import header from './ingame-header';
+import ingameHeader from './ingame-header';
 import stats from './ingame-stats';
 import footer from './footer';
 
@@ -32,42 +32,55 @@ const templateGame = (state, options) => `\
   </div>`;
 
 const template = (state, options) => `\
-  ${header(state)}
+  ${ingameHeader(state)}
   ${templateGame(state, options)}
   ${footer()}`;
 
-
-const questions = [`question1`];
-const IMG_WIDTH = 705;
-const IMG_HEIGHT = 455;
+const IMG_WIDTH = 705, IMG_HEIGHT = 455;
 
 
 export default (state, options) => {
 
   const element = utils.getScreenFromTemplate(template(state, options));
 
+  const backButton = element.querySelector(`.header__back`);
   const gameContent = element.querySelector(`.game__content`);
+  const gameTimer = element.querySelector(`.game__timer`);
 
+  const questions = options.map((option, index) => `question${index + 1}`);
 
-  utils.loadImages(gameContent, IMG_WIDTH, IMG_HEIGHT);
+  const getElements = (question) => {
+    return Array.from(gameContent.elements[question]);
+  };
 
   const isAnswered = (question) => {
-    return Array.from(gameContent.elements[question])
-      .some((answer) => answer.checked);
+    return getElements(question).some((item) => item.checked);
   };
 
 
   gameContent.addEventListener(`click`, () => {
+
     if (questions.every((question) => isAnswered(question))) {
-      game.renderNextLevel(state);
+
+      const answers = options.map((option, index) => {
+        return getElements(`question${index + 1}`)
+          .find((item) => item.checked)
+          .value === option.answer;
+      });
+
+      const levelTime = game.rules.levelTime - parseInt(gameTimer.textContent);
+      const levelPassed = answers.every((answer) => answer);
+
+      game.finishLevel(state, levelTime, levelPassed);
     }
   });
 
+  backButton.addEventListener(`click`, () => game.reset());
 
-  const backButton = element.querySelector(`.header__back`);
-
-  backButton.addEventListener(`click`, () => {
-    game.reset();
+  utils.uploadImages(gameContent, IMG_WIDTH, IMG_HEIGHT, () => {
+    game.startLevel(state, (timerTiks) => {
+      gameTimer.textContent = timerTiks;
+    });
   });
 
   return element;

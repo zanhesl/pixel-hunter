@@ -3,6 +3,7 @@ import * as utils from './utils';
 import * as game from './game';
 
 import header from './header';
+import resultsTable from './data-results';
 import ingameStats from './ingame-stats';
 import footer from './footer';
 
@@ -11,13 +12,13 @@ const countResults = (results, result) => {
   return results.filter((item) => item === result).length;
 };
 
-const getPoints = (results) => {
+const getGamePoints = (results) => {
 
   const count = results.filter((result) => {
-    return game.isCorrectResult(result);
+    return Math.abs(game.rules.points[result]);
   }).length;
 
-  return count * game.rules.pointsPerResult;
+  return count * game.rules.points.correct;
 };
 
 
@@ -28,8 +29,8 @@ const templateSpeedBonus = (count) => {
       <td></td>
       <td class="result__extra">Бонус за скорость:</td>
       <td class="result__extra">${count}&nbsp;<span class="stats__result stats__result--fast"></span></td>
-      <td class="result__points">×&nbsp;${game.rules.speedBonusPoints}</td>
-      <td class="result__total">${count * game.rules.speedBonusPoints}</td>
+      <td class="result__points">×&nbsp;${game.rules.points.fast}</td>
+      <td class="result__total">${count * game.rules.points.fast}</td>
     </tr>`;
 };
 
@@ -40,8 +41,8 @@ const templateLivesBonus = (count) => {
       <td></td>
       <td class="result__extra">Бонус за жизни:</td>
       <td class="result__extra">${count}&nbsp;<span class="stats__result stats__result--heart"></span></td>
-      <td class="result__points">×&nbsp;${game.rules.livesBonusPoints}</td>
-      <td class="result__total">${count * game.rules.livesBonusPoints}</td>
+      <td class="result__points">×&nbsp;${game.rules.points.live}</td>
+      <td class="result__total">${count * game.rules.points.live}</td>
     </tr>`;
 };
 
@@ -52,8 +53,8 @@ const templateSpeedPenalty = (count) => {
       <td></td>
       <td class="result__extra">Штраф за медлительность:</td>
       <td class="result__extra">${count}&nbsp;<span class="stats__result stats__result--slow"></span></td>
-      <td class="result__points">×&nbsp;${-game.rules.speedPenaltyPoints}</td>
-      <td class="result__total">${count * game.rules.speedPenaltyPoints}</td>
+      <td class="result__points">×&nbsp;${-game.rules.points.slow}</td>
+      <td class="result__total">${count * game.rules.points.slow}</td>
     </tr>`;
 };
 
@@ -71,18 +72,18 @@ const templateTableResults = (index, results) => {
       <td class="result__total  result__total--final">fail</td>`;
   } else {
 
-    let totalPoints = getPoints(results);
+    let totalPoints = getGamePoints(results);
 
     templateTableStat = `\
-      <td class="result__points">×&nbsp;${game.rules.pointsPerResult}</td>
+      <td class="result__points">×&nbsp;${game.rules.points.correct}</td>
       <td class="result__total">${totalPoints}</td>`;
 
     const speedBonusCounts = countResults(results, `fast`);
     const speedPenaltyCounts = countResults(results, `slow`);
 
-    totalPoints += livesCount * game.rules.livesBonusPoints +
-      speedBonusCounts * game.rules.speedBonusPoints +
-      speedPenaltyCounts * game.rules.speedPenaltyPoints;
+    totalPoints += livesCount * game.rules.points.live +
+      speedBonusCounts * game.rules.points.fast +
+      speedPenaltyCounts * game.rules.points.slow;
 
     templateTableExtra = `\
       ${templateSpeedBonus(speedBonusCounts)}
@@ -108,9 +109,10 @@ const templateTableResults = (index, results) => {
 
 const templateResults = (stats) => `\
   <div class="result">
-    <h1>Победа!</h1>
-    ${stats.map((stat, index) => {
-      return templateTableResults(index + 1, stat.results);
+    <h1>${(stats.lives >= 0) ? "Победа!" : "Fail"}</h1>
+    ${templateTableResults(1, stats.results)}
+    ${resultsTable.map((results, index) => {
+      return templateTableResults(index + 2, results);
     }).join(``)}
   </div>`;
 
@@ -126,10 +128,7 @@ export default (stats) => {
 
   const backButton = element.querySelector(`.header__back`);
 
-
-  backButton.addEventListener(`click`, () => {
-    game.reset();
-  });
+  backButton.addEventListener(`click`, () => game.reset());
 
   return element;
 };
