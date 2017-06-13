@@ -10,7 +10,7 @@ export default (state) => `\
         <img src="img/logo_small.png" width="101" height="44">
       </span>
     </div>
-    <h1 class="game__timer">NN</h1>
+    <h1 class="game__timer">${game.rules.levelTime}</h1>
     <div class="game__lives">
       ${new Array(game.rules.maxLives - state.lives)
         .fill(`<img src="img/heart__empty.svg" class="game__heart" alt="Life" width="32" height="32">`)

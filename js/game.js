@@ -1,5 +1,5 @@
 
-import levels from './levels';
+import levels from './data-levels';
 
 import ingameTask1 from './ingame-task-1';
 import ingameTask2 from './ingame-task-2';
@@ -9,98 +9,181 @@ import greetingScreen from './greeting';
 import statsScreen from './stats';
 
 
-export const rules = {
-  timePerLevel: 30,
-  slowTime: 25,
-  quickTime: 8,
-  pointsPerResult: 100,
-  speedBonusPoints: 50,
-  speedPenaltyPoints: -50,
-  livesBonusPoints: 50,
-  maxLives: 3,
-  numberOfLevels: levels.length
-};
-
-export const stats = [
-  {
-    name: `Mary`,
-    results: [`wrong`, `slow`, `fast`, `correct`, `wrong`, `unknown`, `slow`, `unknown`, `fast`, `unknown`]
-  }, {
-    name: `Finn`,
-    results: [`wrong`, `slow`, `fast`, `correct`, `wrong`, `unknown`, `slow`, `wrong`, `fast`, `wrong`]
-  }, {
-    name: `Alice`,
-    results: [`wrong`, `fast`, `fast`, `correct`, `wrong`, `unknown`, `slow`, `wrong`, `slow`, `slow`]
-  }, {
-    name: `Bob`,
-    results: [`correct`, `fast`, `correct`, `correct`, `fast`, `correct`, `correct`, `slow`, `correct`, `correct`]
-  }
-];
-
-export const initialState = Object.freeze({
-  level: 0,
-  lives: rules.maxLives,
-  name: ``,
-  results: Object.freeze(new Array(rules.numberOfLevels).fill(`unknown`))
-});
-
-const taskTypes = {
+const ingameTasks = Object.freeze({
   'task-1': ingameTask1,
   'task-2': ingameTask2,
   'task-3': ingameTask3
+});
+
+const extraPoints = {
+  fast: `Бонус за скорость:`,
+  heart: `Бонус за жизни:`,
+  slow: `Штраф за медлительность:`
 };
 
-const correctResults = new Set([`slow`, `fast`, `correct`]);
+let levelTimer = null;
 
-const viewport = document.querySelector(`.viewport`);
 
+export const rules = Object.freeze({
+  levelTime: 30,
+  slowTime: 20,
+  quickTime: 10,
+  points: Object.freeze({
+    correct: 100,
+    fast: 50,
+    slow: -50,
+    wrong: 0,
+    unknown: 0,
+    heart: 50
+  }),
+  maxLives: 3,
+  levelsCount: levels.length
+});
+
+export const state = Object.freeze({
+  level: 0,
+  lives: rules.maxLives,
+  name: `Unknown`,
+  results: Object.freeze(new Array(rules.levelsCount).fill(`unknown`))
+});
 
 export function renderScreen(screen) {
+
+  const viewport = document.querySelector(`.viewport`);
+
   viewport.innerHTML = ``;
   viewport.appendChild(screen);
 }
 
-export function isCorrectResult(result) {
-  return correctResults.has(result);
+export function renderLevel(curState) {
+
+  const level = levels[curState.level];
+
+  renderScreen(ingameTasks[level.task](curState, level.options));
 }
 
-export function renderLevel(state) {
+export function renderNextLevel(curState) {
 
-  const type = levels[state.level].type;
-  const options = levels[state.level].options;
-
-  const screen = taskTypes[type](state, options);
-
-  renderScreen(screen);
-}
-
-export function renderNextLevel(state) {
-
-  state.level++;
-
-  if (state.level < rules.numberOfLevels) {
-
-    renderLevel(state);
-
+  if ((curState.lives >= 0) && (curState.level + 1) < rules.levelsCount) {
+    renderLevel(Object.assign({}, curState, {
+      level: curState.level + 1
+    }));
   } else {
-
-    stats.unshift({
-      name: state.name,
-      results: state.results
-    });
-
-    renderScreen(statsScreen(stats));
+    renderScreen(statsScreen(curState));
   }
 }
 
-export function start(userName = `Unknown`) {
-  renderLevel(Object.assign({},
-      initialState, {
-        'name': userName,
-        'results': initialState.results.slice(0)
-      }));
+export function getLevelResult(levelTime, levelPassed) {
+
+  if (!levelPassed || levelTime <= 0) {
+    return `wrong`;
+  } else if (levelPassed && levelTime < rules.quickTime) {
+    return `fast`;
+  } else if (levelPassed && levelTime > rules.slowTime) {
+    return `slow`;
+  } else if (levelPassed) {
+    return `correct`;
+  } else {
+    return `wrong`;
+  }
+}
+
+export function startLevel(curState, onLevelTime) {
+
+  const TIMER_DELAY = 1000;
+
+  let timerTiks = rules.levelTime;
+
+  levelTimer = setInterval(() => {
+
+    timerTiks--;
+
+    if (typeof onLevelTime === `function`) {
+      onLevelTime(timerTiks);
+    }
+
+    if (!timerTiks) {
+      finishLevel(curState);
+    }
+
+  }, TIMER_DELAY);
+}
+
+export function finishLevel(curState, levelTime, levelPassed) {
+
+  clearInterval(levelTimer);
+
+  const result = getLevelResult(levelTime, levelPassed);
+
+  const newState = Object.assign({}, curState, {
+    lives: (result === `wrong`)
+      ? curState.lives - 1
+      : curState.lives,
+    results: curState.results.slice()
+  });
+
+  newState.results.splice(curState.level, 1, result);
+
+  renderNextLevel(newState);
+}
+
+export function countResults(results, value) {
+  return results.filter((result) => result === value).length;
+}
+
+export function getLivesCount(results) {
+
+  const lives = rules.maxLives - countResults(results, `wrong`);
+
+  return (lives >= 0) ? lives : 0;
+}
+
+export function getPoints(results) {
+  return results.filter((result) => {
+    return Math.abs(rules.points[result]);
+  }).length * rules.points.correct;
+}
+
+export function getTotalPoints(results) {
+  return getPoints(results) + Object.keys(extraPoints).map((key) => {
+
+    const keyCount = (key === `heart`)
+      ? getLivesCount(results)
+      : countResults(results, key);
+
+    return keyCount * rules.points[key];
+
+  }).reduce((pValue, cValue) => pValue + cValue);
+}
+
+export function getExtraPointsList(results) {
+
+  return Object.keys(extraPoints).map((key) => {
+
+    const keyCount = (key === `heart`)
+      ? getLivesCount(results)
+      : countResults(results, key);
+
+    return {
+      name: key,
+      title: extraPoints[key],
+      count: keyCount,
+      points: Math.abs(rules.points[key]),
+      totalPoints: keyCount * rules.points[key]
+    };
+  });
+}
+
+export function start(curState, userName) {
+  renderLevel(Object.assign({}, curState, {
+    name: userName,
+    results: curState.results.slice()
+  }));
 }
 
 export function reset() {
+
+  clearInterval(levelTimer);
+
   renderScreen(greetingScreen());
 }

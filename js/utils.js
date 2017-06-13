@@ -9,8 +9,7 @@ export function getScreenFromTemplate(htmContent) {
   return wrapper;
 }
 
-
-function scaleImage(img, width, height) {
+export function scaleImage(img, width, height) {
 
   const imgHeight = img.naturalHeight;
   const imgWidth = img.naturalWidth;
@@ -20,51 +19,50 @@ function scaleImage(img, width, height) {
   img.width = ((width / ratio) < height) ? width : height * ratio;
   img.height = ((width / ratio) < height) ? width / ratio : height;
 
-  // console.log(`Image upload ${imgWidth}:${imgHeight}(${imgWidth/imgHeight})`);
+  // console.log(`Image '${img.src}' ${imgWidth}:${imgHeight}(${imgWidth/imgHeight})`);
   // console.log(`${img.width}:${img.height}(${img.width/img.height}) in ${width}:${height}(${width/height})`);
 }
 
-function loadImage(src, width, height, callback) {
+export function loadImage(src, onLoadCompleted) {
 
-  let imageLoadTimeout = null;
+  let timeout = null;
+
+  const img = new Image();
+  const TIMEOUT_DELAY = 5000;
+
+  img.addEventListener(`load`, () => {
+    clearTimeout(timeout);
+
+    if (typeof onLoadCompleted === `function`) {
+      onLoadCompleted(img);
+    }
+  });
+
+  timeout = setTimeout(() => {
+    img.src = ``;
+  }, TIMEOUT_DELAY);
+
+  img.src = src;
+}
+
+export function uploadImages(parent, width, height, onLoadCompleted) {
+
+  const imgs = Array.from(parent.querySelectorAll(`img`))
+    .filter((img) => img.hasAttribute(`data-src`));
+
+  let imgsCount = imgs.length;
 
 
-  const image = new Image();
-
-  image.addEventListener(`load`, () => {
-    clearTimeout(imageLoadTimeout);
+  imgs.forEach((img) => loadImage(img.dataset.src, (image) => {
 
     scaleImage(image, width, height);
 
-    callback(image);
-  });
+    image.alt = img.alt;
 
-  image.addEventListener(`error`, () => {
-    // console.log(`Unable upload image: ${src}`);
-  });
+    img.parentNode.replaceChild(image, img);
 
-
-  const LOAD_TIMEOUT = 5000;
-
-  imageLoadTimeout = setTimeout(() => {
-    image.src = ``;
-  }, LOAD_TIMEOUT);
-
-
-  image.src = src;
-}
-
-
-export function loadImages(parent, width, height) {
-
-  const images = parent.querySelectorAll(`img`);
-
-  Array.from(images).forEach((img) => {
-
-    loadImage(img.dataset.src, width, height, (image) => {
-
-      image.alt = img.alt;
-      img.parentNode.replaceChild(image, img);
-    });
-  });
+    if (--imgsCount === 0 && typeof onLoadCompleted === `function`) {
+      onLoadCompleted();
+    }
+  }));
 }

@@ -2,9 +2,10 @@
 import * as utils from './utils';
 import * as game from './game';
 
-import header from './ingame-header';
+import ingameHeader from './ingame-header';
 import stats from './ingame-stats';
 import footer from './footer';
+
 
 const templateGameOption = (option, index) => `\
   <div class="game__option">
@@ -23,7 +24,7 @@ const templateGame = (state, options) => `\
   </div>`;
 
 const template = (state, options) => `\
-  ${header(state)}
+  ${ingameHeader(state)}
   ${templateGame(state, options)}
   ${footer()}`;
 
@@ -35,23 +36,28 @@ export default (state, options) => {
 
   const element = utils.getScreenFromTemplate(template(state, options));
 
+  const backButton = element.querySelector(`.header__back`);
   const gameContent = element.querySelector(`.game__content`);
   const gameAnswers = gameContent.querySelectorAll(`.game__option`);
+  const gameTimer = element.querySelector(`.game__timer`);
 
 
-  utils.loadImages(gameContent, IMG_WIDTH, IMG_HEIGHT);
-
-  Array.from(gameAnswers).forEach((answer) => {
+  Array.from(gameAnswers).forEach((answer, index) => {
     answer.addEventListener(`click`, () => {
-      game.renderNextLevel(state);
+
+      const levelTime = game.rules.levelTime - parseInt(gameTimer.textContent, 10);
+      const levelPassed = options[index].answer === `paint`;
+
+      game.finishLevel(state, levelTime, levelPassed);
     });
   });
 
+  backButton.addEventListener(`click`, () => game.reset());
 
-  const backButton = element.querySelector(`.header__back`);
-
-  backButton.addEventListener(`click`, () => {
-    game.reset();
+  utils.uploadImages(gameContent, IMG_WIDTH, IMG_HEIGHT, () => {
+    game.startLevel(state, (timerTiks) => {
+      gameTimer.textContent = timerTiks;
+    });
   });
 
   return element;
