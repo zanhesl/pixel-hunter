@@ -95,149 +95,145 @@ describe(`Game`, () => {
 
     it(`should give correct level's points (without extra points)`, () => {
 
-      assert.equal(game.getPoints(
-        [`wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `unknown`, `unknown`, `unknown`, `unknown`, `unknown`]
-      ), 0);
+      const tests = [{
+        results: [`wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `unknown`, `unknown`, `unknown`, `unknown`, `unknown`],
+        points: 0
+      }, {
+        results: [`correct`, `wrong`, `fast`, `wrong`, `wrong`, `correct`, `wrong`, `correct`, `correct`, `wrong`],
+        points: 500
+      }, {
+        results: [`correct`, `correct`, `fast`, `slow`, `correct`, `unknown`, `slow`, `wrong`, `wrong`, `fast`],
+        points: 700
+      }, {
+        results: [`correct`, `correct`, `fast`, `slow`, `correct`, `correct`, `slow`, `correct`, `correct`, `fast`],
+        points: 1000
+      }];
 
-      assert.equal(game.getPoints(
-        [`correct`, `wrong`, `fast`, `wrong`, `wrong`, `correct`, `wrong`, `correct`, `correct`, `wrong`]
-      ), 500);
+      function runTest(test) {
+        const points = game.getPoints(test.results);
 
-      assert.equal(game.getPoints(
-        [`correct`, `correct`, `fast`, `slow`, `correct`, `unknown`, `slow`, `wrong`, `wrong`, `fast`]
-      ), 700);
+        assert.equal(points, test.points);
+      }
 
-      assert.equal(game.getPoints(
-        [`correct`, `correct`, `fast`, `slow`, `correct`, `correct`, `slow`, `correct`, `correct`, `fast`]
-      ), 1000);
+      tests.forEach(runTest);
     });
 
     it(`should give correct total level's points (with extra points)`, () => {
 
-      assert.equal(game.getTotalPoints(
-        [`wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`]
-      ), 0);
+      const tests = [{
+        results: [`wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`],
+        points: 0
+      }, {
+        results: [`correct`, `wrong`, `fast`, `wrong`, `slow`, `correct`, `slow`, `correct`, `correct`, `wrong`],
+        points: 650
+      }, {
+        results: [`correct`, `correct`, `fast`, `slow`, `correct`, `correct`, `slow`, `wrong`, `wrong`, `fast`],
+        points: 850
+      }, {
+        results: [`correct`, `correct`, `fast`, `slow`, `correct`, `slow`, `slow`, `correct`, `correct`, `fast`],
+        points: 1100
+      }, {
+        results: [`correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`],
+        points: 1150
+      }];
 
-      assert.equal(game.getTotalPoints(
-        [`correct`, `wrong`, `fast`, `wrong`, `slow`, `correct`, `slow`, `correct`, `correct`, `wrong`]
-      ), 650);
+      function runTest(test) {
+        const points = game.getTotalPoints(test.results);
 
-      assert.equal(game.getTotalPoints(
-        [`correct`, `correct`, `fast`, `slow`, `correct`, `correct`, `slow`, `wrong`, `wrong`, `fast`]
-      ), 850);
+        assert.equal(points, test.points);
+      }
 
-      assert.equal(game.getTotalPoints(
-        [`correct`, `correct`, `fast`, `slow`, `correct`, `slow`, `slow`, `correct`, `correct`, `fast`]
-      ), 1100);
-
-      assert.equal(game.getTotalPoints(
-        [`correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`]
-      ), 1150);
+      tests.forEach(runTest);
     });
 
     it(`should give correct fast answer extra points`, () => {
 
-      assert.equal(game.getExtraPointsList(
-        [`correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`]
-      )[0].count, 0);
+      const tests = [{
+        results: [`correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`],
+        count: 0,
+        totalPoints: 0
+      }, {
+        results: [`correct`, `correct`, `fast`, `slow`, `correct`, `fast`, `slow`, `correct`, `correct`, `fast`],
+        count: 3,
+        totalPoints: 150
+      }, {
+        results: [`fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`],
+        count: 10,
+        totalPoints: 500
+      }, {
+        results: [`correct`, `correct`, `fast`, `slow`, `correct`, `slow`, `slow`, `correct`, `correct`, `fast`],
+        count: 2,
+        totalPoints: 100
+      }];
 
-      assert.equal(game.getExtraPointsList(
-        [`correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`]
-      )[0].totalPoints, 0);
+      function runTest(test) {
+        const pointsList = game.getExtraPointsList(test.results);
 
-      assert.equal(game.getExtraPointsList(
-        [`correct`, `correct`, `fast`, `slow`, `correct`, `fast`, `slow`, `correct`, `correct`, `fast`]
-      )[0].count, 3);
+        assert.equal(pointsList[0].count, test.count);
+        assert.equal(pointsList[0].totalPoints, test.totalPoints);
+      }
 
-      assert.equal(game.getExtraPointsList(
-        [`correct`, `correct`, `fast`, `slow`, `correct`, `fast`, `slow`, `correct`, `correct`, `fast`]
-      )[0].totalPoints, 150);
-
-      assert.equal(game.getExtraPointsList(
-        [`fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`]
-      )[0].count, 10);
-
-      assert.equal(game.getExtraPointsList(
-        [`fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`]
-      )[0].totalPoints, 500);
-
-      assert.equal(game.getExtraPointsList(
-        [`correct`, `correct`, `fast`, `slow`, `correct`, `slow`, `slow`, `correct`, `correct`, `fast`]
-      )[0].count, 2);
-
-      assert.equal(game.getExtraPointsList(
-        [`correct`, `correct`, `fast`, `slow`, `correct`, `slow`, `slow`, `correct`, `correct`, `fast`]
-      )[0].totalPoints, 100);
+      tests.forEach(runTest);
     });
 
     it(`should give correct lives extra points`, () => {
 
-      assert.equal(game.getExtraPointsList(
-        [`correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`]
-      )[1].count, 3);
+      const tests = [{
+        results: [`correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`],
+        count: 3,
+        totalPoints: 150
+      }, {
+        results: [`correct`, `wrong`, `fast`, `slow`, `correct`, `fast`, `slow`, `wrong`, `correct`, `fast`],
+        count: 1,
+        totalPoints: 50
+      }, {
+        results: [`wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`],
+        count: 0,
+        totalPoints: 0
+      }, {
+        results: [`correct`, `correct`, `fast`, `slow`, `correct`, `slow`, `slow`, `correct`, `correct`, `fast`],
+        count: 3,
+        totalPoints: 150
+      }];
 
-      assert.equal(game.getExtraPointsList(
-        [`correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`]
-      )[1].totalPoints, 150);
+      function runTest(test) {
+        const pointsList = game.getExtraPointsList(test.results);
 
-      assert.equal(game.getExtraPointsList(
-        [`correct`, `wrong`, `fast`, `slow`, `correct`, `fast`, `slow`, `wrong`, `correct`, `fast`]
-      )[1].count, 1);
+        assert.equal(pointsList[1].count, test.count);
+        assert.equal(pointsList[1].totalPoints, test.totalPoints);
+      }
 
-      assert.equal(game.getExtraPointsList(
-        [`correct`, `wrong`, `fast`, `slow`, `correct`, `fast`, `slow`, `wrong`, `correct`, `fast`]
-      )[1].totalPoints, 50);
-
-      assert.equal(game.getExtraPointsList(
-        [`wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`]
-      )[1].count, 0);
-
-      assert.equal(game.getExtraPointsList(
-        [`wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`]
-      )[1].totalPoints, 0);
-
-      assert.equal(game.getExtraPointsList(
-        [`correct`, `correct`, `fast`, `slow`, `correct`, `slow`, `slow`, `correct`, `correct`, `fast`]
-      )[1].count, 3);
-
-      assert.equal(game.getExtraPointsList(
-        [`correct`, `correct`, `fast`, `slow`, `correct`, `slow`, `slow`, `correct`, `correct`, `fast`]
-      )[1].totalPoints, 150);
+      tests.forEach(runTest);
     });
 
     it(`should give correct slow answer extra points`, () => {
 
-      assert.equal(game.getExtraPointsList(
-        [`correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`]
-      )[2].count, 0);
+      const tests = [{
+        results: [`correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`],
+        count: 0,
+        totalPoints: 0
+      }, {
+        results: [`correct`, `correct`, `fast`, `slow`, `correct`, `fast`, `slow`, `correct`, `correct`, `fast`],
+        count: 2,
+        totalPoints: -100
+      }, {
+        results: [`slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`],
+        count: 10,
+        totalPoints: -500
+      }, {
+        results: [`correct`, `correct`, `fast`, `slow`, `correct`, `slow`, `slow`, `correct`, `correct`, `fast`],
+        count: 3,
+        totalPoints: -150
+      }];
 
-      assert.equal(game.getExtraPointsList(
-        [`correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`]
-      )[2].totalPoints, 0);
+      function runTest(test) {
+        const pointsList = game.getExtraPointsList(test.results);
 
-      assert.equal(game.getExtraPointsList(
-        [`correct`, `correct`, `fast`, `slow`, `correct`, `fast`, `slow`, `correct`, `correct`, `fast`]
-      )[2].count, 2);
+        assert.equal(pointsList[2].count, test.count);
+        assert.equal(pointsList[2].totalPoints, test.totalPoints);
+      }
 
-      assert.equal(game.getExtraPointsList(
-        [`correct`, `correct`, `fast`, `slow`, `correct`, `fast`, `slow`, `correct`, `correct`, `fast`]
-      )[2].totalPoints, -100);
-
-      assert.equal(game.getExtraPointsList(
-        [`slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`]
-      )[2].count, 10);
-
-      assert.equal(game.getExtraPointsList(
-        [`slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`]
-      )[2].totalPoints, -500);
-
-      assert.equal(game.getExtraPointsList(
-        [`correct`, `correct`, `fast`, `slow`, `correct`, `slow`, `slow`, `correct`, `correct`, `fast`]
-      )[2].count, 3);
-
-      assert.equal(game.getExtraPointsList(
-        [`correct`, `correct`, `fast`, `slow`, `correct`, `slow`, `slow`, `correct`, `correct`, `fast`]
-      )[2].totalPoints, -150);
+      tests.forEach(runTest);
     });
   });
 });
