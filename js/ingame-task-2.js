@@ -36,7 +36,8 @@ const template = (state, options) => `\
   ${templateGame(state, options)}
   ${footer()}`;
 
-const IMG_WIDTH = 705, IMG_HEIGHT = 455;
+const IMG_WIDTH = 705;
+const IMG_HEIGHT = 455;
 
 
 export default (state, options) => {
@@ -68,7 +69,7 @@ export default (state, options) => {
           .value === option.answer;
       });
 
-      const levelTime = game.rules.levelTime - parseInt(gameTimer.textContent);
+      const levelTime = game.rules.levelTime - parseInt(gameTimer.textContent, 10);
       const levelPassed = answers.every((answer) => answer);
 
       game.finishLevel(state, levelTime, levelPassed);

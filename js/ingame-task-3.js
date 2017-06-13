@@ -28,7 +28,8 @@ const template = (state, options) => `\
   ${templateGame(state, options)}
   ${footer()}`;
 
-const IMG_WIDTH = 304, IMG_HEIGHT = 455;
+const IMG_WIDTH = 304;
+const IMG_HEIGHT = 455;
 
 
 export default (state, options) => {
@@ -44,7 +45,7 @@ export default (state, options) => {
   Array.from(gameAnswers).forEach((answer, index) => {
     answer.addEventListener(`click`, () => {
 
-      const levelTime = game.rules.levelTime - parseInt(gameTimer.textContent);
+      const levelTime = game.rules.levelTime - parseInt(gameTimer.textContent, 10);
       const levelPassed = options[index].answer === `paint`;
 
       game.finishLevel(state, levelTime, levelPassed);

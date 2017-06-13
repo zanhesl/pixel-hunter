@@ -15,6 +15,12 @@ const ingameTasks = Object.freeze({
   'task-3': ingameTask3
 });
 
+const extraPoints = {
+  fast: `Бонус за скорость:`,
+  heart: `Бонус за жизни:`,
+  slow: `Штраф за медлительность:`
+};
+
 let levelTimer = null;
 
 
@@ -28,7 +34,7 @@ export const rules = Object.freeze({
     slow: -50,
     wrong: 0,
     unknown: 0,
-    live: 50
+    heart: 50
   }),
   maxLives: 3,
   levelsCount: levels.length
@@ -69,10 +75,10 @@ export function renderNextLevel(curState = state) {
 
 export function applyLevelResults(curState = state, levelTime = 0, levelPassed = false) {
 
-  let results = `unknown`,
-    livePenalty = 0;
+  let results = `unknown`;
+  let livePenalty = 0;
 
-  if (! levelPassed || levelTime <= 0) {
+  if (!levelPassed || levelTime <= 0) {
     results = `wrong`;
     livePenalty = 1;
   } else if (levelPassed && levelTime <= rules.quickTime) {
@@ -108,7 +114,6 @@ export function startLevel(curState = state, onLevelTime) {
     }
 
     if (!timerTiks) {
-      clearInterval(levelTimer);
       finishLevel(curState);
     }
 
@@ -122,8 +127,51 @@ export function finishLevel(curState = state, levelTime = 0, levelPassed = false
   renderNextLevel(applyLevelResults(curState, levelTime, levelPassed));
 }
 
-export function start(curState = state, userName = `Unknown`) {
+export function countResults(results, value) {
+  return results.filter((result) => result === value).length;
+}
 
+export function getLivesCount(results) {
+  return rules.maxLives - countResults(results, `wrong`);
+}
+
+export function getPoints(results) {
+  return results.filter((result) => {
+    return Math.abs(rules.points[result]);
+  }).length * rules.points.correct;
+}
+
+export function getTotalPoints(results) {
+  return getPoints(results) + Object.keys(extraPoints).map((key) => {
+
+    const keyCount = (key === `heart`)
+      ? getLivesCount(results)
+      : countResults(results, key);
+
+    return keyCount * rules.points[key];
+
+  }).reduce((pValue, cValue) => pValue + cValue);
+}
+
+export function getExtraPointsList(results) {
+
+  return Object.keys(extraPoints).map((key) => {
+
+    const keyCount = (key === `heart`)
+      ? getLivesCount(results)
+      : countResults(results, key);
+
+    return {
+      name: key,
+      title: extraPoints[key],
+      count: keyCount,
+      points: Math.abs(rules.points[key]),
+      totalPoints: keyCount * rules.points[key]
+    };
+  });
+}
+
+export function start(curState = state, userName = `Unknown`) {
   renderLevel(Object.assign({}, curState, {
     name: userName,
     results: curState.results.slice()
@@ -131,5 +179,8 @@ export function start(curState = state, userName = `Unknown`) {
 }
 
 export function reset() {
+
+  clearInterval(levelTimer);
+
   renderScreen(greetingScreen());
 }

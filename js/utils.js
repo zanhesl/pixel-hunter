@@ -27,8 +27,8 @@ export function loadImage(src, onLoadCompleted) {
 
   let timeout = null;
 
-  const img = new Image(),
-    TIMEOUT_DELAY = 5000;
+  const img = new Image();
+  const TIMEOUT_DELAY = 5000;
 
   img.addEventListener(`load`, () => {
     clearTimeout(timeout);
@@ -38,7 +38,9 @@ export function loadImage(src, onLoadCompleted) {
     }
   });
 
-  timeout = setTimeout(() => img.src = ``, TIMEOUT_DELAY);
+  timeout = setTimeout(() => {
+    img.src = ``;
+  }, TIMEOUT_DELAY);
 
   img.src = src;
 }
