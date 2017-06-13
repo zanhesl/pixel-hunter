@@ -55,14 +55,14 @@ export function renderScreen(screen) {
   viewport.appendChild(screen);
 }
 
-export function renderLevel(curState = state) {
+export function renderLevel(curState) {
 
   const level = levels[curState.level];
 
   renderScreen(ingameTasks[level.task](curState, level.options));
 }
 
-export function renderNextLevel(curState = state) {
+export function renderNextLevel(curState) {
 
   if ((curState.lives >= 0) && (curState.level + 1) < rules.levelsCount) {
     renderLevel(Object.assign({}, curState, {
@@ -73,33 +73,22 @@ export function renderNextLevel(curState = state) {
   }
 }
 
-export function applyLevelResults(curState = state, levelTime = 0, levelPassed = false) {
-
-  let results = `unknown`;
-  let livePenalty = 0;
+export function getLevelResult(levelTime, levelPassed) {
 
   if (!levelPassed || levelTime <= 0) {
-    results = `wrong`;
-    livePenalty = 1;
-  } else if (levelPassed && levelTime <= rules.quickTime) {
-    results = `fast`;
-  } else if (levelPassed && levelTime >= rules.slowTime) {
-    results = `slow`;
+    return `wrong`;
+  } else if (levelPassed && levelTime < rules.quickTime) {
+    return `fast`;
+  } else if (levelPassed && levelTime > rules.slowTime) {
+    return `slow`;
   } else if (levelPassed) {
-    results = `correct`;
+    return `correct`;
+  } else {
+    return `wrong`;
   }
-
-  const newState = Object.assign({}, curState, {
-    lives: curState.lives - livePenalty,
-    results: curState.results.slice()
-  });
-
-  newState.results[curState.level] = results;
-
-  return newState;
 }
 
-export function startLevel(curState = state, onLevelTime) {
+export function startLevel(curState, onLevelTime) {
 
   const TIMER_DELAY = 1000;
 
@@ -120,11 +109,22 @@ export function startLevel(curState = state, onLevelTime) {
   }, TIMER_DELAY);
 }
 
-export function finishLevel(curState = state, levelTime = 0, levelPassed = false) {
+export function finishLevel(curState, levelTime, levelPassed) {
 
   clearInterval(levelTimer);
 
-  renderNextLevel(applyLevelResults(curState, levelTime, levelPassed));
+  const result = getLevelResult(levelTime, levelPassed);
+
+  const newState = Object.assign({}, curState, {
+    lives: (result === `wrong`)
+      ? curState.lives - 1
+      : curState.lives,
+    results: curState.results.slice()
+  });
+
+  newState.results.splice(curState.level, 1, result);
+
+  renderNextLevel(newState);
 }
 
 export function countResults(results, value) {
@@ -132,7 +132,10 @@ export function countResults(results, value) {
 }
 
 export function getLivesCount(results) {
-  return rules.maxLives - countResults(results, `wrong`);
+
+  const lives = rules.maxLives - countResults(results, `wrong`);
+
+  return (lives >= 0) ? lives : 0;
 }
 
 export function getPoints(results) {
@@ -171,7 +174,7 @@ export function getExtraPointsList(results) {
   });
 }
 
-export function start(curState = state, userName = `Unknown`) {
+export function start(curState, userName) {
   renderLevel(Object.assign({}, curState, {
     name: userName,
     results: curState.results.slice()
