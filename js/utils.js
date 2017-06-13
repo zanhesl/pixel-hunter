@@ -9,18 +9,22 @@ export function getScreenFromTemplate(htmContent) {
   return wrapper;
 }
 
-export function scaleImage(img, width, height) {
+export function resizeImage(frame, given) {
 
-  const imgHeight = img.naturalHeight;
-  const imgWidth = img.naturalWidth;
+  const ratio = given.width / given.height;
 
-  const ratio = imgWidth / imgHeight;
+  const actualWidth = ((frame.width / ratio) < frame.height)
+    ? frame.width
+    : frame.height * ratio;
 
-  img.width = ((width / ratio) < height) ? width : height * ratio;
-  img.height = ((width / ratio) < height) ? width / ratio : height;
+  const actualHeight = ((frame.width / ratio) < frame.height)
+    ? frame.width / ratio
+    : frame.height;
 
-  // console.log(`Image '${img.src}' ${imgWidth}:${imgHeight}(${imgWidth/imgHeight})`);
-  // console.log(`${img.width}:${img.height}(${img.width/img.height}) in ${width}:${height}(${width/height})`);
+  return {
+    width: actualWidth,
+    height: actualHeight
+  };
 }
 
 export function loadImage(src, onLoadCompleted) {
@@ -55,7 +59,13 @@ export function uploadImages(parent, width, height, onLoadCompleted) {
 
   imgs.forEach((img) => loadImage(img.dataset.src, (image) => {
 
-    scaleImage(image, width, height);
+    const actual = resizeImage({width, height}, {
+      width: image.naturalWidth,
+      height: image.naturalHeight
+    });
+
+    image.width = actual.width;
+    image.height = actual.height;
 
     image.alt = img.alt;
 
