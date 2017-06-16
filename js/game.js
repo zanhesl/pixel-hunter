@@ -1,6 +1,7 @@
 
 import levels from './data-levels';
 
+import ingameLevel from './ingame-level';
 import ingameTask1 from './ingame-task-1';
 import ingameTask2 from './ingame-task-2';
 import ingameTask3 from './ingame-task-3';
@@ -8,12 +9,12 @@ import ingameTask3 from './ingame-task-3';
 import greetingScreen from './greeting';
 import statsScreen from './stats';
 
-
+/*
 const ingameTasks = Object.freeze({
   'task-1': ingameTask1,
   'task-2': ingameTask2,
   'task-3': ingameTask3
-});
+});*/
 
 const extraPoints = {
   fast: `Бонус за скорость:`,
@@ -57,9 +58,9 @@ export function renderScreen(screen) {
 
 export function renderLevel(curState) {
 
-  const level = levels[curState.level];
+  const level = ingameLevel(curState, levels[curState.level]);
 
-  renderScreen(ingameTasks[level.task](curState, level.options));
+  renderScreen(level);
 }
 
 export function renderNextLevel(curState) {
