@@ -7,26 +7,27 @@ import stats from './ingame-stats';
 import footer from './footer';
 
 
-const types = [{
+const types = [
+  {
     title: `Угадайте для каждого изображения фото или рисунок?`,
     formClass: `game__content`,
-    frame: { width: 468, height: 458 },
+    frame: {width: 468, height: 458},
     questions: [`question1`, `question2`]
   }, {
     title: `Угадай, фото или рисунок?`,
     formClass: `game__content  game__content--wide`,
-    frame: { width: 705, height: 455 },
+    frame: {width: 705, height: 455},
     questions: [`question1`]
   }, {
     title: `Найдите рисунок среди изображений`,
     formClass: `game__content  game__content--triple`,
-    frame: { width: 304, height: 455 },
+    frame: {width: 304, height: 455},
     questions: [],
     choose: `paint`
   }, {
     title: `Найдите фото среди изображений`,
     formClass: `game__content  game__content--triple`,
-    frame: { width: 304, height: 455 },
+    frame: {width: 304, height: 455},
     questions: [],
     choose: `photo`
   }];
@@ -88,7 +89,7 @@ export default (state, options) => {
 
   const isAnswered = () => {
     return level.questions.every((question) => {
-      return getElements(question).some((item) => item.checked)
+      return getElements(question).some((item) => item.checked);
     });
   };
 
@@ -138,7 +139,7 @@ export default (state, options) => {
       }
 
       if (!hasQuestions()) {
-        game.finishLevel(state,  getLevelTime(), isChoosenAnswerRight(optionIndex));
+        game.finishLevel(state, getLevelTime(), isChoosenAnswerRight(optionIndex));
       }
     });
 

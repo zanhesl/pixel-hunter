@@ -64,7 +64,7 @@ export function loadLevels(onLoadCompleted) {
       if (!count && typeof onLoadCompleted === `function`) {
         onLoadCompleted();
       }
-    })
+    });
   });
 }
 
