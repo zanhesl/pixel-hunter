@@ -7,56 +7,52 @@ import stats from './ingame-stats';
 import footer from './footer';
 
 
-const getSingleAnswer = (answers) => {
-
-  const isPaintAnswerSingle = answers
-    .filter((answer) => answer === `paint`)
-    .length === 1;
-
-  return (isPaintAnswerSingle) ? `paint` : `photo`;
-};
-
 const types = [{
-    title: () => `Угадайте для каждого изображения фото или рисунок?`,
+    title: `Угадайте для каждого изображения фото или рисунок?`,
     formClass: `game__content`,
-    imgFrame: { width: 468, height: 458 },
-    answers: { photo: `Фото`, paint: `Рисунок` }
+    frame: { width: 468, height: 458 },
+    questions: [`question1`, `question2`]
   }, {
-    title: () => `Угадай, фото или рисунок?`,
+    title: `Угадай, фото или рисунок?`,
     formClass: `game__content  game__content--wide`,
-    imgFrame: { width: 705, height: 455 },
-    answers: { photo: `Фото`, paint: `Рисунок` }
+    frame: { width: 705, height: 455 },
+    questions: [`question1`]
   }, {
-    title: (answers) => {
-      return (getSingleAnswer(answers) === `paint`)
-        ? `Найдите рисунок среди изображений`
-        : `Найдите фото среди изображений`
-    },
+    title: `Найдите рисунок среди изображений`,
     formClass: `game__content  game__content--triple`,
-    imgFrame: { width: 304, height: 455 },
-    answers: {}
+    frame: { width: 304, height: 455 },
+    questions: [],
+    choose: `paint`
+  }, {
+    title: `Найдите фото среди изображений`,
+    formClass: `game__content  game__content--triple`,
+    frame: { width: 304, height: 455 },
+    questions: [],
+    choose: `photo`
   }];
 
-const templateAnswer = (optionIndex, answerKey, answerValue) => `\
-  <label class="game__answer game__answer--${answerKey}">
-    <input name="question${optionIndex}" type="radio" value="${answerKey}">
-    <span>${answerValue}</span>
+const templateQuestion = (question) => `\
+  <label class="game__answer game__answer--photo">
+    <input name="${question}" type="radio" value="photo">
+    <span>Фото</span>
+  </label>
+  <label class="game__answer game__answer--paint">
+    <input name="${question}" type="radio" value="paint">
+    <span>Рисунок</span>
   </label>`;
 
-const templateOption = (optionIndex, option) => `\
+const templateOption = (question) => `\
   <div class="game__option">
-    <img alt="Option ${optionIndex}" data-src="${option.src}">
-    ${Object.keys(option.answers).map((answerKey) => {
-      return templateAnswer(optionIndex, answerKey, option.answers[answerKey]);
-    }).join(``)}
+    <img>
+    ${(question) ? templateQuestion(question) : ``}
   </div>`;
 
-const templateGame = (templateOptions, results) => `\
+const templateGame = (level, results) => `\
   <div class="game">
-    <p class="game__task">${templateOptions.title}</p>
-    <form class="${templateOptions.formClass}">
-      ${templateOptions.options.map((option, optionIndex) => {
-        return templateOption(optionIndex + 1, option);
+    <p class="game__task">${level.title}</p>
+    <form class="${level.formClass}">
+      ${level.options.map((option, index) => {
+        return templateOption(level.questions[index]);
       }).join(``)}
     </form>
     <div class="stats">
@@ -64,33 +60,22 @@ const templateGame = (templateOptions, results) => `\
     </div>
   </div>`;
 
-const template = (templateOptions, state) => `\
+const template = (level, state) => `\
   ${ingameHeader(state)}
-  ${templateGame(templateOptions, state.results)}
+  ${templateGame(level, state.results)}
   ${footer()}`;
 
 
-export default (state, levelOptions) => {
+export default (state, options) => {
 
-  const params = types[levelOptions.type];
+  const level = Object.assign({}, options, types[options.type]);
 
-  const templateOptions = {
-    title: params.title(levelOptions.answers),
-    formClass: params.formClass,
-    options: levelOptions.src.map((item) => {
-      return {src: item, answers: params.answers};
-    }),
-  };
-
-  const element = utils.getScreenFromTemplate(template(templateOptions, state));
+  const element = utils.getScreenFromTemplate(template(level, state));
 
   const backButton = element.querySelector(`.header__back`);
   const gameContent = element.querySelector(`.game__content`);
   const gameOptions = gameContent.querySelectorAll(`.game__option`);
   const gameTimer = element.querySelector(`.game__timer`);
-
-  const questions = Object.keys(levelOptions.answers).map((answer, index) => `question${index + 1}`);
-  console.log(questions);
 
   const getElements = (question) => {
     return Array.from(gameContent.elements[question]);
@@ -102,54 +87,69 @@ export default (state, levelOptions) => {
 
 
   const isAnswered = () => {
-    return questions && questions.every((question) => {
+    return level.questions.every((question) => {
       return getElements(question).some((item) => item.checked)
     });
   };
 
   const hasQuestions = () => {
-    return questions && questions.length;
+    return level.questions.length;
   };
 
   const isQuestionsAnswerRight = () => {
-    return questions && levelOptions.answers.map((answer, index) => {
-      return getElements(questions[index])
+    return level.questions.map((question, index) => {
+      return getElements(question)
         .find((item) => item.checked)
-        .value === answer;
+        .value === level.options[index];
     }).every((answer) => answer);
   };
 
   const isChoosenAnswerRight = (optionIndex) => {
-    return levelOptions.answers[optionIndex] === getSingleAnswer(answers);
+    return level.options[optionIndex] === level.choose;
+  };
+
+  const getOptionImage = (optionIndex) => {
+
+    const img = level.img[optionIndex];
+
+    const actualSize = utils.resizeImage(level.frame, {
+      width: img.naturalWidth,
+      height: img.naturalHeight
+    });
+
+    img.width = actualSize.width;
+    img.height = actualSize.height;
+
+    return img;
   };
 
 
   Array.from(gameOptions).forEach((option, optionIndex) => {
+
+    const optionImgTag = option.querySelector(`img`);
+    const optionImg = getOptionImage(optionIndex);
+
+    optionImgTag.parentNode.replaceChild(optionImg, optionImgTag);
+
     option.addEventListener(`click`, (evt) => {
 
-      if (hasQuestions()) {
+      if (hasQuestions() && isAnswered()) {
+        game.finishLevel(state, getLevelTime(), isQuestionsAnswerRight());
+      }
 
-        if (isAnswered()) {
-          game.finishLevel(state, getLevelTime(), isQuestionsAnswerRight());
-        }
-      } else {
-
+      if (!hasQuestions()) {
         game.finishLevel(state,  getLevelTime(), isChoosenAnswerRight(optionIndex));
       }
     });
+
   });
 
 
   backButton.addEventListener(`click`, () => game.reset());
 
 
-  utils.uploadImages(gameContent,
-    params.imgFrame.width,
-    params.imgFrame.height,
-    () => {
-      game.startLevel(state, (timerTiks) => {
-        gameTimer.textContent = timerTiks;
-      });
+  game.startLevel(state, (timerTiks) => {
+    gameTimer.textContent = timerTiks;
   });
 
   return element;

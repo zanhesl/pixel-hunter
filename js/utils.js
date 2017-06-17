@@ -42,6 +42,14 @@ export function loadImage(src, onLoadCompleted) {
     }
   });
 
+  img.addEventListener(`error`, () => {
+    clearTimeout(timeout);
+
+    if (typeof onLoadCompleted === `function`) {
+      onLoadCompleted();
+    }
+  });
+
   timeout = setTimeout(() => {
     img.src = ``;
   }, TIMEOUT_DELAY);
@@ -49,30 +57,22 @@ export function loadImage(src, onLoadCompleted) {
   img.src = src;
 }
 
-export function uploadImages(parent, width, height, onLoadCompleted) {
+export function loadImages(srcArray, onLoadCompleted) {
 
-  const imgs = Array.from(parent.querySelectorAll(`img`))
-    .filter((img) => img.hasAttribute(`data-src`));
+  const imgs = [];
 
-  let imgsCount = imgs.length;
+  let count = srcArray.length;
 
+  srcArray.forEach((src, index) => {
 
-  imgs.forEach((img) => loadImage(img.dataset.src, (image) => {
+    loadImage(src, (img) => {
 
-    const actual = resizeImage({width, height}, {
-      width: image.naturalWidth,
-      height: image.naturalHeight
+      imgs[index] = img;
+      count--;
+
+      if (!count && typeof onLoadCompleted === `function`) {
+        onLoadCompleted(imgs);
+      }
     });
-
-    image.width = actual.width;
-    image.height = actual.height;
-
-    image.alt = img.alt;
-
-    img.parentNode.replaceChild(image, img);
-
-    if (--imgsCount === 0 && typeof onLoadCompleted === `function`) {
-      onLoadCompleted();
-    }
-  }));
+  });
 }

@@ -1,20 +1,12 @@
 
+import * as utils from './utils';
+
 import levels from './data-levels';
 
 import ingameLevel from './ingame-level';
-import ingameTask1 from './ingame-task-1';
-import ingameTask2 from './ingame-task-2';
-import ingameTask3 from './ingame-task-3';
-
 import greetingScreen from './greeting';
 import statsScreen from './stats';
 
-/*
-const ingameTasks = Object.freeze({
-  'task-1': ingameTask1,
-  'task-2': ingameTask2,
-  'task-3': ingameTask3
-});*/
 
 const extraPoints = {
   fast: `Бонус за скорость:`,
@@ -54,6 +46,26 @@ export function renderScreen(screen) {
 
   viewport.innerHTML = ``;
   viewport.appendChild(screen);
+}
+
+export function loadLevels(onLoadCompleted) {
+
+  let count = levels.length;
+
+  levels.forEach((level, index) => {
+
+    utils.loadImages(level.src, (imgs) => {
+
+      levels[index].img = imgs;
+      count--;
+
+      // console.log(`Imgs of level ${index} is loaded, ${count} left`);
+
+      if (!count && typeof onLoadCompleted === `function`) {
+        onLoadCompleted();
+      }
+    })
+  });
 }
 
 export function renderLevel(curState) {
@@ -176,10 +188,13 @@ export function getExtraPointsList(results) {
 }
 
 export function start(curState, userName) {
-  renderLevel(Object.assign({}, curState, {
-    name: userName,
-    results: curState.results.slice()
-  }));
+
+  loadLevels(() => {
+    renderLevel(Object.assign({}, curState, {
+      name: userName,
+      results: curState.results.slice()
+    }));
+  });
 }
 
 export function reset() {

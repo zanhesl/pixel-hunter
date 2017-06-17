@@ -43,6 +43,9 @@ export default () => {
   rulesForm.addEventListener(`submit`, (evt) => {
     evt.preventDefault();
 
+    rulesInput.disabled = true;
+    rulesButton.disabled = true;
+
     game.start(game.state, rulesInput.value);
   });
 
