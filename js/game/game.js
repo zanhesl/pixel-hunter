@@ -1,11 +1,11 @@
 
-import * as utils from './utils';
+import * as utils from './../utils';
 
 import levels from './data-levels';
 
-import ingameLevel from './ingame-level';
-import greetingScreen from './greeting';
-import statsScreen from './stats';
+import ingameLevel from '../level/level';
+import greetingScreen from '../greeting/greeting';
+import statsScreen from '../stats/stats';
 
 
 const extraPoints = {
@@ -42,10 +42,10 @@ export const state = Object.freeze({
 
 export function renderScreen(screen) {
 
-  const viewport = document.querySelector(`.viewport`);
+  const viewport = document.getElementById(`main`);
 
   viewport.innerHTML = ``;
-  viewport.appendChild(screen);
+  viewport.appendChild(screen.element);
 }
 
 export function loadLevels(onLoadCompleted) {
@@ -70,9 +70,13 @@ export function loadLevels(onLoadCompleted) {
 
 export function renderLevel(curState) {
 
-  const level = ingameLevel(curState, levels[curState.level]);
+  const levelScreen = ingameLevel(curState, levels[curState.level]);
 
-  renderScreen(level);
+  renderScreen(levelScreen);
+
+  startLevel(curState, (timerTiks) => {
+    levelScreen.levelTime = timerTiks;
+  });
 }
 
 export function renderNextLevel(curState) {
@@ -135,7 +139,7 @@ export function finishLevel(curState, levelTime, levelPassed) {
     results: curState.results.slice()
   });
 
-  newState.results.splice(curState.level, 1, result);
+  newState.results[curState.level] = result;
 
   renderNextLevel(newState);
 }
