@@ -39,8 +39,8 @@ export default class RulesView extends AbstractView {
     rulesForm.addEventListener(`submit`, (evt) => {
       evt.preventDefault();
 
-      // rulesInput.disabled = true;
-      // rulesButton.disabled = true;
+      rulesInput.disabled = true;
+      rulesButton.disabled = true;
 
       this.onContinueButtonClick(rulesInput.value);
     });

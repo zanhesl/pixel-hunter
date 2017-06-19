@@ -3,14 +3,17 @@ import * as game from '../game/game';
 import RulesView from './rules-view';
 
 
-const rulesScreen = new RulesView();
+export default () => {
 
-rulesScreen.onContinueButtonClick = (userName) => {
-  game.start(game.state, userName);
-};
+  const rulesScreen = new RulesView();
 
-rulesScreen.onBackButtonClick = () => {
-  game.reset();
-};
+  rulesScreen.onContinueButtonClick = (userName) => {
+    game.start(game.state, userName);
+  };
 
-export default () => rulesScreen;
+  rulesScreen.onBackButtonClick = () => {
+    game.reset();
+  };
+
+  return rulesScreen;
+}
