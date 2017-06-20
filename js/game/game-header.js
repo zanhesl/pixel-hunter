@@ -1,5 +1,5 @@
 
-import {rules} from '../game/game';
+import {rules} from '../data/data';
 
 
 export default (state) => `\

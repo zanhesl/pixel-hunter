@@ -1,16 +1,23 @@
 
-import * as game from '../game/game';
-
+import {renderScreen} from '../data/data';
+import dataResults from '../data/data-results';
 import StatsView from './stats-view';
+import Application from '../application';
 
 
-export default (state) => {
+class StatsPresenter {
+  constructor(stats) {
+    this.view = new StatsView([stats, ...dataResults]);
+  }
 
-  const statsScreen = new StatsView(state);
+  init() {
 
-  statsScreen.onBackButtonClick = () => {
-    game.reset();
-  };
+    renderScreen(this.view);
 
-  return statsScreen;
-};
+    this.view.onBackButtonClick = () => {
+      Application.showGreeting();
+    };
+  }
+}
+
+export default new StatsPresenter();

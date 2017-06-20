@@ -1,13 +1,22 @@
 
-import * as game from '../game/game';
+import {renderScreen} from '../data/data';
 import GreetingView from './greeting-view';
-import rulesScreen from '../rules/rules';
+import Application from '../application';
 
 
-const greetingScreen = new GreetingView();
+class GreetingPresenter {
+  constructor() {
+    this.view = new GreetingView();
+  }
 
-greetingScreen.onContinueButtonClick = () => {
-  game.renderScreen(rulesScreen());
-};
+  init() {
 
-export default () => greetingScreen;
+    renderScreen(this.view);
+
+    this.view.onContinueButtonClick = () => {
+      Application.showRules();
+    };
+  }
+}
+
+export default new GreetingPresenter();

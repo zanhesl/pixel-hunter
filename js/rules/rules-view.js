@@ -1,6 +1,6 @@
 
 import AbstractView from '../view';
-import {rules} from '../game/game';
+import {rules} from '../data/data';
 import header from '../header';
 import footer from '../footer';
 
@@ -39,8 +39,8 @@ export default class RulesView extends AbstractView {
     rulesForm.addEventListener(`submit`, (evt) => {
       evt.preventDefault();
 
-      rulesInput.disabled = true;
-      rulesButton.disabled = true;
+      //rulesInput.disabled = true;
+      //rulesButton.disabled = true;
 
       this.onContinueButtonClick(rulesInput.value);
     });

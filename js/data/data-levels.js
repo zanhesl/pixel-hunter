@@ -1,5 +1,8 @@
 
-export default [
+import * as utils from './../utils';
+
+
+export const levels = [
   {
     type: 0,
     src: [`https://ae01.alicdn.com/kf/HTB1KrnHQpXXXXcaaXXXq6xXFXXXv/Free-Shipping-Youthful-Pleasures-font-b-Pino-b-font-Portrait-font-b-Art-b-font-font.jpg`, `https://ae01.alicdn.com/kf/HTB1VwzZQpXXXXcYXFXXq6xXFXXXq/Free-Shipping-Remember-When-Pino-font-b-Portrait-b-font-Art-Print-World-font-b-Famous.jpg`],
@@ -42,3 +45,32 @@ export default [
     options: [`paint`, `photo`, `paint`]
   }
 ];
+
+
+export function loadLevels(onLoadCompleted) {
+
+  let count = levels.length;
+
+  levels.forEach((level, index) => {
+
+    utils.loadImages(level.src, (imgs) => {
+
+      levels[index].img = imgs;
+      count--;
+
+      console.log(`Imgs of level ${index} is loaded, ${count} left`);
+
+      if (!count && typeof onLoadCompleted === `function`) {
+        onLoadCompleted(levels);
+      }
+    });
+  });
+}
+
+export function getLevel(levelIndex) {
+  return levels[levelIndex];
+}
+
+export function getLevelCount() {
+  return levels.length;
+}

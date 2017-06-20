@@ -1,12 +1,12 @@
 
 import AbstractView from '../view';
 import {resizeImage} from '../utils';
-import {rules} from '../game/game';
-import header from './level-header';
+import {rules} from '../data/data';
+import header from './game-header';
 import footer from '../footer';
 
 
-export default class LevelView extends AbstractView {
+export default class GameView extends AbstractView {
 
   constructor(state, level) {
     super();

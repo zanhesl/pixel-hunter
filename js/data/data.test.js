@@ -1,7 +1,7 @@
 
 import assert from 'assert';
 
-import * as game from './game';
+import * as data from './data';
 
 
 describe(`Game`, () => {
