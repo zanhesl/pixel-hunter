@@ -1,19 +1,12 @@
 
+import * as utils from './../utils';
+
 import levels from './data-levels';
 
-import ingameTask1 from './ingame-task-1';
-import ingameTask2 from './ingame-task-2';
-import ingameTask3 from './ingame-task-3';
+import ingameLevel from '../level/level';
+import greetingScreen from '../greeting/greeting';
+import statsScreen from '../stats/stats';
 
-import greetingScreen from './greeting';
-import statsScreen from './stats';
-
-
-const ingameTasks = Object.freeze({
-  'task-1': ingameTask1,
-  'task-2': ingameTask2,
-  'task-3': ingameTask3
-});
 
 const extraPoints = {
   fast: `Бонус за скорость:`,
@@ -49,17 +42,41 @@ export const state = Object.freeze({
 
 export function renderScreen(screen) {
 
-  const viewport = document.querySelector(`.viewport`);
+  const viewport = document.getElementById(`main`);
 
   viewport.innerHTML = ``;
-  viewport.appendChild(screen);
+  viewport.appendChild(screen.element);
+}
+
+export function loadLevels(onLoadCompleted) {
+
+  let count = levels.length;
+
+  levels.forEach((level, index) => {
+
+    utils.loadImages(level.src, (imgs) => {
+
+      levels[index].img = imgs;
+      count--;
+
+      // console.log(`Imgs of level ${index} is loaded, ${count} left`);
+
+      if (!count && typeof onLoadCompleted === `function`) {
+        onLoadCompleted();
+      }
+    });
+  });
 }
 
 export function renderLevel(curState) {
 
-  const level = levels[curState.level];
+  const levelScreen = ingameLevel(curState, levels[curState.level]);
 
-  renderScreen(ingameTasks[level.task](curState, level.options));
+  renderScreen(levelScreen);
+
+  startLevel(curState, (timerTiks) => {
+    levelScreen.levelTime = timerTiks;
+  });
 }
 
 export function renderNextLevel(curState) {
@@ -122,7 +139,7 @@ export function finishLevel(curState, levelTime, levelPassed) {
     results: curState.results.slice()
   });
 
-  newState.results.splice(curState.level, 1, result);
+  newState.results[curState.level] = result;
 
   renderNextLevel(newState);
 }
@@ -175,10 +192,13 @@ export function getExtraPointsList(results) {
 }
 
 export function start(curState, userName) {
-  renderLevel(Object.assign({}, curState, {
-    name: userName,
-    results: curState.results.slice()
-  }));
+
+  loadLevels(() => {
+    renderLevel(Object.assign({}, curState, {
+      name: userName,
+      results: curState.results.slice()
+    }));
+  });
 }
 
 export function reset() {
