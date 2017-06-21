@@ -5,16 +5,17 @@ import {getLivesCount} from '../data/data';
 import {getPoints} from '../data/data';
 import {getExtraPointsList} from '../data/data';
 import {getTotalPoints} from '../data/data';
+import dataResults from '../data/data-results';
 import header from '../header';
 import footer from '../footer';
 
 
 export default class StatsView extends AbstractView {
 
-  constructor(stats) {
+  constructor(state) {
     super();
-
-    this.stats = stats;
+    this.state = state;
+    this.stats = [this.state.results, ...dataResults];
   }
 
 
@@ -74,7 +75,7 @@ export default class StatsView extends AbstractView {
     return `\
       ${header()}
       <div class="result">
-        <h1>${(getLivesCount(this.stats[0]) >= 0) ? `Победа!` : `Fail`}</h1>
+        <h1>${(getLivesCount(this.state.results) >= 0) ? `Победа!` : `Fail`}</h1>
         ${this.stats.map((results, index) => {
           return this._templateTableResults(index + 1, results);
         }).join(``)}

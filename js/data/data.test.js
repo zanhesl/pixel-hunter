@@ -22,7 +22,6 @@ describe(`Game`, () => {
     it(`should give wrong level result`, () => {
 
       assert.equal(game.getLevelResult(0, false), `wrong`);
-      assert.equal(game.getLevelResult(0, true), `wrong`);
       assert.equal(game.getLevelResult(-5, true), `wrong`);
       assert.equal(game.getLevelResult(0, false), `wrong`);
       assert.equal(game.getLevelResult(-5, false), `wrong`);
@@ -37,7 +36,7 @@ describe(`Game`, () => {
     });
 
     it(`should give fast level result`, () => {
-
+      assert.equal(game.getLevelResult(0, true), `fast`);
       assert.equal(game.getLevelResult(5, true), `fast`);
     });
 
@@ -87,7 +86,7 @@ describe(`Game`, () => {
 
       assert.equal(game.getLivesCount(
         [`wrong`, `slow`, `wrong`, `correct`, `wrong`, `unknown`, `wrong`, `unknown`, `wrong`, `unknown`]
-      ), 0);
+      ), -2);
     });
   });
 

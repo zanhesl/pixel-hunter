@@ -1,13 +1,13 @@
 
 import {renderScreen} from '../data/data';
-import dataResults from '../data/data-results';
 import StatsView from './stats-view';
 import Application from '../application';
 
 
 class StatsPresenter {
-  constructor(stats) {
-    this.view = new StatsView([stats, ...dataResults]);
+  constructor(state) {
+    this.state = state;
+    this.view = new StatsView(state);
   }
 
   init() {
@@ -20,4 +20,4 @@ class StatsPresenter {
   }
 }
 
-export default new StatsPresenter();
+export default StatsPresenter;

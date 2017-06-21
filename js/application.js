@@ -1,31 +1,31 @@
 
 
-import introScreen from './intro/intro';
-import greetingScreen from './greeting/greeting';
-import rulesScreen from './rules/rules';
-import gameScreen from './game/game';
-import statsScreen from './stats/stats';
+import IntroPresenter from './intro/intro';
+import GreetingPresenter from './greeting/greeting';
+import RulesPresenter from './rules/rules';
+import GamePresenter from './game/game';
+import StatsPresenter from './stats/stats';
 
 
 export default class Application {
 
   static showIntro() {
-    introScreen.init();
+    (new IntroPresenter()).init();
   }
 
   static showGreeting() {
-    greetingScreen.init();
+    (new GreetingPresenter()).init();
   }
 
   static showRules() {
-    rulesScreen.init();
+    (new RulesPresenter()).init();
   }
 
   static showGame(state) {
-    gameScreen.init(state);
+    (new GamePresenter(state)).init();
   }
 
-  static showStats(stats) {
-    statsScreen.init(stats);
+  static showStats(state) {
+    (new StatsPresenter(state)).init();
   }
 }

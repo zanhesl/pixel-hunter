@@ -35,8 +35,10 @@ export function loadImage(src, onLoadCompleted) {
   img.addEventListener(`error`, () => {
     clearTimeout(timeout);
 
+    img.src = ``;
+
     if (typeof onLoadCompleted === `function`) {
-      onLoadCompleted();
+      onLoadCompleted(img);
     }
   });
 

@@ -1,12 +1,6 @@
 
 import * as utils from './../utils';
-
-import {getLevelCount} from './data-levels';
-//import {levels} from './data-levels';
-
-//import ingameLevel from '../level/level';
-//import greetingScreen from '../greeting/greeting';
-//import statsScreen from '../stats/stats';
+import Levels from './data-levels';
 
 
 const extraPoints = {
@@ -19,7 +13,7 @@ let levelTimer = null;
 
 
 export const rules = Object.freeze({
-  levelTime: 30,
+  gameTime: 30,
   slowTime: 20,
   quickTime: 10,
   points: Object.freeze({
@@ -31,7 +25,7 @@ export const rules = Object.freeze({
     heart: 50
   }),
   maxLives: 3,
-  levelsCount: getLevelCount()
+  levelsCount: Levels.count
 });
 
 export const state = Object.freeze({
@@ -75,52 +69,14 @@ export function renderScreen(screen) {
   viewport.innerHTML = ``;
   viewport.appendChild(screen.element);
 }
-/*
-export function loadLevels(onLoadCompleted) {
 
-  let count = levels.length;
-
-  levels.forEach((level, index) => {
-
-    utils.loadImages(level.src, (imgs) => {
-
-      levels[index].img = imgs;
-      count--;
-
-      // console.log(`Imgs of level ${index} is loaded, ${count} left`);
-
-      if (!count && typeof onLoadCompleted === `function`) {
-        onLoadCompleted(levels);
-      }
-    });
-  });
-}
-*/
-export function renderLevel(curState) {
-
-  const levelScreen = null;// = ingameLevel(curState, levels[curState.level]);
-
-  renderScreen(levelScreen);
-
-  startLevel(curState, (timerTiks) => {
-    levelScreen.levelTime = timerTiks;
-  });
-}
-
-export function renderNextLevel(curState) {
-
-  if ((curState.lives >= 0) && (curState.level + 1) < rules.levelsCount) {
-    renderLevel(Object.assign({}, curState, {
-      level: curState.level + 1
-    }));
-  } else {
-    //renderScreen(statsScreen(curState));
-  }
+export function countResults(results, value) {
+  return results.filter((result) => result === value).length;
 }
 
 export function getLevelResult(levelTime, levelPassed) {
 
-  if (!levelPassed || levelTime <= 0) {
+  if (!levelPassed || levelTime < 0) {
     return `wrong`;
   } else if (levelPassed && levelTime < rules.quickTime) {
     return `fast`;
@@ -133,56 +89,8 @@ export function getLevelResult(levelTime, levelPassed) {
   }
 }
 
-
-export function startLevel(curState, onLevelTime) {
-
-  const TIMER_DELAY = 1000;
-
-  let timerTiks = rules.levelTime;
-
-  levelTimer = setInterval(() => {
-
-    timerTiks--;
-
-    if (typeof onLevelTime === `function`) {
-      onLevelTime(timerTiks);
-    }
-
-    if (!timerTiks) {
-      finishLevel(curState);
-    }
-
-  }, TIMER_DELAY);
-}
-
-export function finishLevel(curState, levelTime, levelPassed) {
-
-  clearInterval(levelTimer);
-
-  const result = getLevelResult(levelTime, levelPassed);
-
-  const newState = Object.assign({}, curState, {
-    lives: (result === `wrong`)
-      ? curState.lives - 1
-      : curState.lives,
-    results: curState.results.slice()
-  });
-
-  newState.results[curState.level] = result;
-
-  renderNextLevel(newState);
-}
-
-
-export function countResults(results, value) {
-  return results.filter((result) => result === value).length;
-}
-
 export function getLivesCount(results) {
-
-  const lives = rules.maxLives - countResults(results, `wrong`);
-
-  return (lives >= 0) ? lives : 0;
+  return rules.maxLives - countResults(results, `wrong`);
 }
 
 export function getPoints(results) {
@@ -219,21 +127,4 @@ export function getExtraPointsList(results) {
       totalPoints: keyCount * rules.points[key]
     };
   });
-}
-
-export function start(curState, userName) {
-
-  loadLevels(() => {
-    renderLevel(Object.assign({}, curState, {
-      name: userName,
-      results: curState.results.slice()
-    }));
-  });
-}
-
-export function reset() {
-
-  clearInterval(levelTimer);
-
-  //renderScreen(greetingScreen());
 }

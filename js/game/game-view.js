@@ -15,7 +15,6 @@ export default class GameView extends AbstractView {
     this.level = level;
   }
 
-
   _getElements(question) {
     return Array.from(this.gameContent.elements[question]);
   }
@@ -30,16 +29,16 @@ export default class GameView extends AbstractView {
     return this.level.questions.length;
   }
 
-  _isQuestionsAnswerRight() {
+  _getAnswers() {
     return this.level.questions.map((question, index) => {
       return this._getElements(question)
         .find((item) => item.checked)
-        .value === this.level.options[index];
-    }).every((answer) => answer);
+        .value;
+    });
   }
 
-  _isChoosenAnswerRight(optionIndex) {
-    return this.level.options[optionIndex] === this.level.choose;
+  _getChoice(optionIndex) {
+    return this.level.options[optionIndex];
   }
 
   _getOptionImage(optionIndex) {
@@ -57,7 +56,6 @@ export default class GameView extends AbstractView {
 
     return img;
   }
-
 
   _templateQuestion(question) {
     return `\
@@ -101,11 +99,11 @@ export default class GameView extends AbstractView {
       ${footer()}`;
   }
 
-  get levelTime() {
-    return rules.levelTime - parseInt(this.gameTimer.textContent, 10);
+  get gameTime() {
+    return rules.gameTime - parseInt(this.gameTimer.textContent, 10);
   }
 
-  set levelTime(time) {
+  set gameTime(time) {
     this.gameTimer.textContent = time;
   }
 
@@ -126,15 +124,14 @@ export default class GameView extends AbstractView {
       option.addEventListener(`click`, (evt) => {
 
         if (this._hasQuestions() && this._isAnswered()) {
-          this.onLevelFinished(this.state, this.levelTime, this._isQuestionsAnswerRight());
+          this.onAnswered(this.gameTime, this._getAnswers());
         }
 
         if (!this._hasQuestions()) {
-          this.onLevelFinished(this.state, this.levelTime, this._isChoosenAnswerRight(optionIndex));
+          this.onChosen(this.gameTime, this._getChoice(optionIndex));
         }
       });
     });
-
 
     const backButton = this.element.querySelector(`.header__back`);
 
@@ -144,7 +141,11 @@ export default class GameView extends AbstractView {
     });
   }
 
-  onLevelFinished(state, levelTime, isAnswerRight) {
+  onAnswered(time, answers) {
+
+  }
+
+  onChosen(time, answer) {
 
   }
 

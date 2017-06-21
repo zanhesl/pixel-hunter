@@ -19,4 +19,4 @@ class IntroPresenter {
   }
 }
 
-export default new IntroPresenter();
+export default IntroPresenter;

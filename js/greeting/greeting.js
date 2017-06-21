@@ -19,4 +19,4 @@ class GreetingPresenter {
   }
 }
 
-export default new GreetingPresenter();
+export default GreetingPresenter;
