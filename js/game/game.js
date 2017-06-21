@@ -10,7 +10,7 @@ import Application from '../application';
 
 
 class GamePresenter {
-  constructor(state) {
+  constructor(state = initState) {
 
     this.state = state;
     this.gameTimer = null;
@@ -23,8 +23,8 @@ class GamePresenter {
     this.level = Levels.getLevel(this.state.level);
 
     this.view = new GameView(this.state, Object.assign({},
-      this.level,
-      types[this.level.type]
+        this.level,
+        types[this.level.type]
     ));
   }
 

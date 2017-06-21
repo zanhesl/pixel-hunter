@@ -1,7 +1,7 @@
 
 import AbstractView from '../view';
 import {rules} from '../data/data';
-import {getLivesCount} from '../data/data';
+import {countResults} from '../data/data';
 import {getPoints} from '../data/data';
 import {getExtraPointsList} from '../data/data';
 import {getTotalPoints} from '../data/data';
@@ -18,6 +18,9 @@ export default class StatsView extends AbstractView {
     this.stats = [this.state.results, ...dataResults];
   }
 
+  _isGameFailed(results) {
+    return (rules.maxLives - countResults(results, `wrong`)) < 0;
+  }
 
   _templateBonus(bonus) {
     return (bonus.count === 0) ? `` : `\
@@ -35,7 +38,7 @@ export default class StatsView extends AbstractView {
     let templateTableStat = ``;
     let templateTableExtra = ``;
 
-    if (getLivesCount(results) < 0) {
+    if (this._isGameFailed(results)) {
 
       templateTableStat = `\
         <td class="result__total"></td>
@@ -75,7 +78,7 @@ export default class StatsView extends AbstractView {
     return `\
       ${header()}
       <div class="result">
-        <h1>${(getLivesCount(this.state.results) >= 0) ? `Победа!` : `Fail`}</h1>
+        <h1>${(this._isGameFailed(this.state.results)) ? `Fail` : `Победа!`}</h1>
         ${this.stats.map((results, index) => {
           return this._templateTableResults(index + 1, results);
         }).join(``)}

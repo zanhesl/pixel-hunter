@@ -7,7 +7,7 @@ class Levels {
 
     this.levels = [
       {
-      type: 2,
+        type: 2,
         src: [`https://s-media-cache-ak0.pinimg.com/originals/e7/6d/05/e76d054b0124b31b6517a06bc13008a6.jpg`, `https://s-media-cache-ak0.pinimg.com/originals/b3/9f/51/b39f51fc34f71cde011c5b528b5072ff.jpg`, `https://s-media-cache-ak0.pinimg.com/736x/f5/a0/62/f5a0626a80fe6026c0ac65cdc2d8ede2.jpg`],
         options: [`photo`, `paint`, `photo`]
       }, {

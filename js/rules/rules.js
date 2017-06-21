@@ -26,14 +26,14 @@ class RulesPresenter {
 
       Levels.onProgress = (progress) => {
         this.view.setProgress(Math.round(progress));
-      }
+      };
 
       Levels.load();
     };
 
     this.view.onBackButtonClick = () => {
       Application.showGreeting();
-    };;
+    };
   }
 }
 

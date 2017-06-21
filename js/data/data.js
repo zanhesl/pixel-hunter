@@ -1,5 +1,4 @@
 
-import * as utils from './../utils';
 import Levels from './data-levels';
 
 
@@ -8,8 +7,6 @@ const extraPoints = {
   heart: `Бонус за жизни:`,
   slow: `Штраф за медлительность:`
 };
-
-let levelTimer = null;
 
 
 export const rules = Object.freeze({
@@ -90,7 +87,10 @@ export function getLevelResult(levelTime, levelPassed) {
 }
 
 export function getLivesCount(results) {
-  return rules.maxLives - countResults(results, `wrong`);
+
+  const lives = rules.maxLives - countResults(results, `wrong`);
+
+  return (lives < 0) ? 0 : lives;
 }
 
 export function getPoints(results) {

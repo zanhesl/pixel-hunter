@@ -9,11 +9,11 @@ describe(`Game`, () => {
   describe(`Initial game state`, () => {
 
     it(`should start from first level`, () => {
-      assert.equal(game.state.level, 0);
+      assert.equal(data.state.level, 0);
     });
 
     it(`should have 3 live on start`, () => {
-      assert.equal(game.state.lives, 3);
+      assert.equal(data.state.lives, 3);
     });
   });
 
@@ -21,72 +21,72 @@ describe(`Game`, () => {
 
     it(`should give wrong level result`, () => {
 
-      assert.equal(game.getLevelResult(0, false), `wrong`);
-      assert.equal(game.getLevelResult(-5, true), `wrong`);
-      assert.equal(game.getLevelResult(0, false), `wrong`);
-      assert.equal(game.getLevelResult(-5, false), `wrong`);
-      assert.equal(game.getLevelResult(0, false), `wrong`);
-      assert.equal(game.getLevelResult(5, false), `wrong`);
-      assert.equal(game.getLevelResult(10, false), `wrong`);
-      assert.equal(game.getLevelResult(15, false), `wrong`);
-      assert.equal(game.getLevelResult(20, false), `wrong`);
-      assert.equal(game.getLevelResult(25, false), `wrong`);
-      assert.equal(game.getLevelResult(30, false), `wrong`);
-      assert.equal(game.getLevelResult(35, false), `wrong`);
+      assert.equal(data.getLevelResult(0, false), `wrong`);
+      assert.equal(data.getLevelResult(-5, true), `wrong`);
+      assert.equal(data.getLevelResult(0, false), `wrong`);
+      assert.equal(data.getLevelResult(-5, false), `wrong`);
+      assert.equal(data.getLevelResult(0, false), `wrong`);
+      assert.equal(data.getLevelResult(5, false), `wrong`);
+      assert.equal(data.getLevelResult(10, false), `wrong`);
+      assert.equal(data.getLevelResult(15, false), `wrong`);
+      assert.equal(data.getLevelResult(20, false), `wrong`);
+      assert.equal(data.getLevelResult(25, false), `wrong`);
+      assert.equal(data.getLevelResult(30, false), `wrong`);
+      assert.equal(data.getLevelResult(35, false), `wrong`);
     });
 
     it(`should give fast level result`, () => {
-      assert.equal(game.getLevelResult(0, true), `fast`);
-      assert.equal(game.getLevelResult(5, true), `fast`);
+      assert.equal(data.getLevelResult(0, true), `fast`);
+      assert.equal(data.getLevelResult(5, true), `fast`);
     });
 
     it(`should give correct level result`, () => {
 
-      assert.equal(game.getLevelResult(10, true), `correct`);
-      assert.equal(game.getLevelResult(15, true), `correct`);
-      assert.equal(game.getLevelResult(20, true), `correct`);
+      assert.equal(data.getLevelResult(10, true), `correct`);
+      assert.equal(data.getLevelResult(15, true), `correct`);
+      assert.equal(data.getLevelResult(20, true), `correct`);
     });
 
     it(`should give slow level result`, () => {
 
-      assert.equal(game.getLevelResult(25, true), `slow`);
-      assert.equal(game.getLevelResult(30, true), `slow`);
-      assert.equal(game.getLevelResult(35, true), `slow`);
+      assert.equal(data.getLevelResult(25, true), `slow`);
+      assert.equal(data.getLevelResult(30, true), `slow`);
+      assert.equal(data.getLevelResult(35, true), `slow`);
     });
 
     it(`should give numbers of given result`, () => {
 
       const results = [`wrong`, `unknown`, `slow`, `fast`, `correct`, `wrong`, `slow`, `slow`, `slow`, `fast`, `fast`, `unknown`];
 
-      assert.equal(game.countResults(results, `wrong`), 2);
-      assert.equal(game.countResults(results, `slow`), 4);
-      assert.equal(game.countResults(results, `fast`), 3);
-      assert.equal(game.countResults(results, `correct`), 1);
-      assert.equal(game.countResults(results, `unknown`), 2);
-      assert.equal(game.countResults(results, `random`), 0);
+      assert.equal(data.countResults(results, `wrong`), 2);
+      assert.equal(data.countResults(results, `slow`), 4);
+      assert.equal(data.countResults(results, `fast`), 3);
+      assert.equal(data.countResults(results, `correct`), 1);
+      assert.equal(data.countResults(results, `unknown`), 2);
+      assert.equal(data.countResults(results, `random`), 0);
     });
 
     it(`should give correct lives left`, () => {
 
-      assert.equal(game.getLivesCount(
+      assert.equal(data.getLivesCount(
         [`correct`, `slow`, `fast`, `correct`, `correct`, `unknown`, `slow`, `unknown`, `fast`, `unknown`]
       ), 3);
 
-      assert.equal(game.getLivesCount(
+      assert.equal(data.getLivesCount(
         [`correct`, `slow`, `fast`, `correct`, `wrong`, `unknown`, `slow`, `unknown`, `fast`, `unknown`]
       ), 2);
 
-      assert.equal(game.getLivesCount(
+      assert.equal(data.getLivesCount(
         [`wrong`, `slow`, `fast`, `correct`, `wrong`, `unknown`, `slow`, `unknown`, `fast`, `unknown`]
       ), 1);
 
-      assert.equal(game.getLivesCount(
+      assert.equal(data.getLivesCount(
         [`wrong`, `slow`, `fast`, `correct`, `wrong`, `unknown`, `slow`, `wrong`, `fast`, `unknown`]
       ), 0);
 
-      assert.equal(game.getLivesCount(
+      assert.equal(data.getLivesCount(
         [`wrong`, `slow`, `wrong`, `correct`, `wrong`, `unknown`, `wrong`, `unknown`, `wrong`, `unknown`]
-      ), -2);
+      ), 0);
     });
   });
 
@@ -109,7 +109,7 @@ describe(`Game`, () => {
       }];
 
       function runTest(test) {
-        const points = game.getPoints(test.results);
+        const points = data.getPoints(test.results);
 
         assert.equal(points, test.points);
       }
@@ -137,7 +137,7 @@ describe(`Game`, () => {
       }];
 
       function runTest(test) {
-        const points = game.getTotalPoints(test.results);
+        const points = data.getTotalPoints(test.results);
 
         assert.equal(points, test.points);
       }
@@ -166,7 +166,7 @@ describe(`Game`, () => {
       }];
 
       function runTest(test) {
-        const pointsList = game.getExtraPointsList(test.results);
+        const pointsList = data.getExtraPointsList(test.results);
 
         assert.equal(pointsList[0].count, test.count);
         assert.equal(pointsList[0].totalPoints, test.totalPoints);
@@ -196,7 +196,7 @@ describe(`Game`, () => {
       }];
 
       function runTest(test) {
-        const pointsList = game.getExtraPointsList(test.results);
+        const pointsList = data.getExtraPointsList(test.results);
 
         assert.equal(pointsList[1].count, test.count);
         assert.equal(pointsList[1].totalPoints, test.totalPoints);
@@ -226,7 +226,7 @@ describe(`Game`, () => {
       }];
 
       function runTest(test) {
-        const pointsList = game.getExtraPointsList(test.results);
+        const pointsList = data.getExtraPointsList(test.results);
 
         assert.equal(pointsList[2].count, test.count);
         assert.equal(pointsList[2].totalPoints, test.totalPoints);
