@@ -1,5 +1,5 @@
 
-import * as game from './game/game';
-import introScreen from './intro/intro';
+import Application from './application';
 
-game.renderScreen(introScreen());
+
+Application.showIntro();

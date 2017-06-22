@@ -1,209 +1,107 @@
 
-import * as utils from './../utils';
-
-import levels from './data-levels';
-
-import ingameLevel from '../level/level';
-import greetingScreen from '../greeting/greeting';
-import statsScreen from '../stats/stats';
-
-
-const extraPoints = {
-  fast: `Бонус за скорость:`,
-  heart: `Бонус за жизни:`,
-  slow: `Штраф за медлительность:`
-};
-
-let levelTimer = null;
+import {renderScreen} from '../data/data';
+import {getLevelResult} from '../data/data';
+import {state as initState} from '../data/data';
+import {rules} from '../data/data';
+import {types} from '../data/data';
+import Levels from '../data/data-levels';
+import GameView from './game-view';
+import Application from '../application';
 
 
-export const rules = Object.freeze({
-  levelTime: 30,
-  slowTime: 20,
-  quickTime: 10,
-  points: Object.freeze({
-    correct: 100,
-    fast: 50,
-    slow: -50,
-    wrong: 0,
-    unknown: 0,
-    heart: 50
-  }),
-  maxLives: 3,
-  levelsCount: levels.length
-});
+class GamePresenter {
+  constructor(state = initState) {
 
-export const state = Object.freeze({
-  level: 0,
-  lives: rules.maxLives,
-  name: `Unknown`,
-  results: Object.freeze(new Array(rules.levelsCount).fill(`unknown`))
-});
+    this.state = state;
+    this.gameTimer = null;
 
-export function renderScreen(screen) {
+    this._createGameView();
+  }
 
-  const viewport = document.getElementById(`main`);
+  _createGameView() {
 
-  viewport.innerHTML = ``;
-  viewport.appendChild(screen.element);
-}
+    this.level = Levels.getLevel(this.state.level);
 
-export function loadLevels(onLoadCompleted) {
+    this.view = new GameView(this.state, Object.assign({},
+        this.level,
+        types[this.level.type]
+    ));
+  }
 
-  let count = levels.length;
+  _startGame() {
 
-  levels.forEach((level, index) => {
+    const TIMER_DELAY = 1000;
 
-    utils.loadImages(level.src, (imgs) => {
+    let timerTiks = rules.gameTime - 1;
 
-      levels[index].img = imgs;
-      count--;
+    this.gameTimer = setInterval(() => {
 
-      // console.log(`Imgs of level ${index} is loaded, ${count} left`);
+      this.view.gameTime = --timerTiks;
 
-      if (!count && typeof onLoadCompleted === `function`) {
-        onLoadCompleted();
+      if (!timerTiks) {
+        this._endGame();
       }
-    });
-  });
-}
-
-export function renderLevel(curState) {
-
-  const levelScreen = ingameLevel(curState, levels[curState.level]);
-
-  renderScreen(levelScreen);
-
-  startLevel(curState, (timerTiks) => {
-    levelScreen.levelTime = timerTiks;
-  });
-}
-
-export function renderNextLevel(curState) {
-
-  if ((curState.lives >= 0) && (curState.level + 1) < rules.levelsCount) {
-    renderLevel(Object.assign({}, curState, {
-      level: curState.level + 1
-    }));
-  } else {
-    renderScreen(statsScreen(curState));
+    }, TIMER_DELAY);
   }
-}
 
-export function getLevelResult(levelTime, levelPassed) {
+  _endGame(time = 0, passed = false) {
 
-  if (!levelPassed || levelTime <= 0) {
-    return `wrong`;
-  } else if (levelPassed && levelTime < rules.quickTime) {
-    return `fast`;
-  } else if (levelPassed && levelTime > rules.slowTime) {
-    return `slow`;
-  } else if (levelPassed) {
-    return `correct`;
-  } else {
-    return `wrong`;
+    clearInterval(this.gameTimer);
+
+    const result = getLevelResult(time, passed);
+
+    this.state.lives = (result === `wrong`)
+        ? this.state.lives - 1
+        : this.state.lives;
+
+    this.state.results[this.state.level] = result;
+
+    this._nextGame();
   }
-}
 
-export function startLevel(curState, onLevelTime) {
+  _nextGame() {
 
-  const TIMER_DELAY = 1000;
+    if ((this.state.lives >= 0) && (this.state.level + 1) < Levels.count) {
 
-  let timerTiks = rules.levelTime;
+      this.state.level++;
 
-  levelTimer = setInterval(() => {
+      this._createGameView();
+      this.init();
 
-    timerTiks--;
-
-    if (typeof onLevelTime === `function`) {
-      onLevelTime(timerTiks);
+    } else {
+      Application.showStats(this.state);
     }
+  }
 
-    if (!timerTiks) {
-      finishLevel(curState);
-    }
+  _isQuestionsAnswerRight(answers) {
+    return answers.map((answer, index) => {
+      return answer === this.level.options[index];
+    }).every((answer) => answer);
+  }
 
-  }, TIMER_DELAY);
-}
+  _isChoosenAnswerRight(answer) {
+    return answer === types[this.level.type].choose;
+  }
 
-export function finishLevel(curState, levelTime, levelPassed) {
+  init() {
 
-  clearInterval(levelTimer);
+    renderScreen(this.view);
 
-  const result = getLevelResult(levelTime, levelPassed);
-
-  const newState = Object.assign({}, curState, {
-    lives: (result === `wrong`)
-      ? curState.lives - 1
-      : curState.lives,
-    results: curState.results.slice()
-  });
-
-  newState.results[curState.level] = result;
-
-  renderNextLevel(newState);
-}
-
-export function countResults(results, value) {
-  return results.filter((result) => result === value).length;
-}
-
-export function getLivesCount(results) {
-
-  const lives = rules.maxLives - countResults(results, `wrong`);
-
-  return (lives >= 0) ? lives : 0;
-}
-
-export function getPoints(results) {
-  return results.filter((result) => {
-    return Math.abs(rules.points[result]);
-  }).length * rules.points.correct;
-}
-
-export function getTotalPoints(results) {
-  return getPoints(results) + Object.keys(extraPoints).map((key) => {
-
-    const keyCount = (key === `heart`)
-      ? getLivesCount(results)
-      : countResults(results, key);
-
-    return keyCount * rules.points[key];
-
-  }).reduce((pValue, cValue) => pValue + cValue);
-}
-
-export function getExtraPointsList(results) {
-
-  return Object.keys(extraPoints).map((key) => {
-
-    const keyCount = (key === `heart`)
-      ? getLivesCount(results)
-      : countResults(results, key);
-
-    return {
-      name: key,
-      title: extraPoints[key],
-      count: keyCount,
-      points: Math.abs(rules.points[key]),
-      totalPoints: keyCount * rules.points[key]
+    this.view.onAnswered = (time, answers) => {
+      this._endGame(time, this._isQuestionsAnswerRight(answers));
     };
-  });
+
+    this.view.onChosen = (time, answer) => {
+      this._endGame(time, this._isChoosenAnswerRight(answer));
+    };
+
+    this.view.onBackButtonClick = () => {
+      clearInterval(this.gameTimer);
+      Application.showGreeting();
+    };
+
+    this._startGame();
+  }
 }
 
-export function start(curState, userName) {
-
-  loadLevels(() => {
-    renderLevel(Object.assign({}, curState, {
-      name: userName,
-      results: curState.results.slice()
-    }));
-  });
-}
-
-export function reset() {
-
-  clearInterval(levelTimer);
-
-  renderScreen(greetingScreen());
-}
+export default GamePresenter;

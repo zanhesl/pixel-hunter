@@ -1,19 +1,40 @@
 
-import * as game from '../game/game';
+import {renderScreen} from '../data/data';
+import {state} from '../data/data';
 import RulesView from './rules-view';
+import Application from '../application';
+import Levels from '../data/data-levels';
 
 
-export default () => {
+class RulesPresenter {
+  constructor() {
+    this.view = new RulesView();
+  }
 
-  const rulesScreen = new RulesView();
+  init() {
 
-  rulesScreen.onContinueButtonClick = (userName) => {
-    game.start(game.state, userName);
-  };
+    renderScreen(this.view);
 
-  rulesScreen.onBackButtonClick = () => {
-    game.reset();
-  };
+    this.view.onContinueButtonClick = (userName) => {
 
-  return rulesScreen;
-};
+      Levels.onLoad = () => {
+        Application.showGame(Object.assign({}, state, {
+          name: userName,
+          results: state.results.slice()
+        }));
+      };
+
+      Levels.onProgress = (progress) => {
+        this.view.setProgress(Math.round(progress));
+      };
+
+      Levels.load();
+    };
+
+    this.view.onBackButtonClick = () => {
+      Application.showGreeting();
+    };
+  }
+}
+
+export default RulesPresenter;
