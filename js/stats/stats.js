@@ -5,9 +5,8 @@ import Application from '../application';
 
 
 class StatsPresenter {
-  constructor(state) {
-    this.state = state;
-    this.view = new StatsView(state);
+  constructor(userName = `Unknown`, results) {
+    this.view = new StatsView(userName, results);
   }
 
   init() {
@@ -20,4 +19,4 @@ class StatsPresenter {
   }
 }
 
-export default StatsPresenter;
+export default (userName, ...results) => new StatsPresenter(userName, results);

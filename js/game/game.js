@@ -10,9 +10,13 @@ import Application from '../application';
 
 
 class GamePresenter {
-  constructor(state = initState) {
+  constructor(userName) {
 
-    this.state = state;
+    this.state = Object.assign({}, initState, {
+      name: userName,
+      results: initState.results.slice()
+    });
+
     this.gameTimer = null;
 
     this._createGameView();
@@ -69,7 +73,7 @@ class GamePresenter {
       this.init();
 
     } else {
-      Application.showStats(this.state);
+      Application.showStats([this.state.name, ...this.state.results]);
     }
   }
 
@@ -104,4 +108,4 @@ class GamePresenter {
   }
 }
 
-export default GamePresenter;
+export default (state) => new GamePresenter(state);

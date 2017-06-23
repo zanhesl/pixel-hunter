@@ -1,6 +1,5 @@
 
 import {renderScreen} from '../data/data';
-import {state} from '../data/data';
 import RulesView from './rules-view';
 import Application from '../application';
 import Levels from '../data/data-levels';
@@ -18,10 +17,7 @@ class RulesPresenter {
     this.view.onContinueButtonClick = (userName) => {
 
       Levels.onLoad = () => {
-        Application.showGame(Object.assign({}, state, {
-          name: userName,
-          results: state.results.slice()
-        }));
+        Application.showGame([userName]);
       };
 
       Levels.onProgress = (progress) => {
@@ -37,4 +33,4 @@ class RulesPresenter {
   }
 }
 
-export default RulesPresenter;
+export default () => new RulesPresenter();

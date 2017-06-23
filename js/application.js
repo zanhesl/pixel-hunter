@@ -7,25 +7,79 @@ import GamePresenter from './game/game';
 import StatsPresenter from './stats/stats';
 
 
-export default class Application {
+const PresenterID = {
+  INTRO: ``,
+  GREETING: `greeting`,
+  RULES: `rules`,
+  GAME: `game`,
+  STATS: `stats`
+};
 
-  static showIntro() {
-    (new IntroPresenter()).init();
+
+class Application {
+  constructor() {
+    this.routes = {
+      [PresenterID.INTRO]: IntroPresenter,
+      [PresenterID.GREETING]: GreetingPresenter,
+      [PresenterID.RULES]: RulesPresenter,
+      [PresenterID.GAME]: GamePresenter,
+      [PresenterID.STATS]: StatsPresenter
+    };
+
+    window.onhashchange = () => {
+      this._changePresenter(this._parseLocationHash());
+    };
   }
 
-  static showGreeting() {
-    (new GreetingPresenter()).init();
+  _parseLocationHash() {
+
+    const hashArgs = location.hash.replace(`#`, ``).split(`/`);
+
+    return {
+      route: hashArgs[0] || ``,
+      args: hashArgs.slice(1)
+    };
   }
 
-  static showRules() {
-    (new RulesPresenter()).init();
+  _setLocationHash(hash) {
+
+    const route = (hash && hash.route) || ``;
+    const args = hash && hash.args && hash.args.map((arg) => `/${arg}`).join(``);
+
+    location.hash = `${route}${(route && args) || ``}`;
   }
 
-  static showGame(state) {
-    (new GamePresenter(state)).init();
+  _changePresenter(hash) {
+    this.routes[hash.route](...hash.args).init();
   }
 
-  static showStats(state) {
-    (new StatsPresenter(state)).init();
+  init() {
+    this._changePresenter(this._parseLocationHash());
+  }
+
+  showIntro() {
+    this._setLocationHash({route: PresenterID.INTRO});
+  }
+
+  showGreeting() {
+    this._setLocationHash({route: PresenterID.GREETING});
+  }
+
+  showRules() {
+    this._setLocationHash({route: PresenterID.RULES});
+  }
+
+  showGame(args) {
+    this._setLocationHash({route: PresenterID.GAME, args});
+  }
+
+  showStats(args) {
+    this._setLocationHash({route: PresenterID.STATS, args});
   }
 }
+
+const instance = new Application();
+
+instance.init();
+
+export default instance;

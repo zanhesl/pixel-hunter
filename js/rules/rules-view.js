@@ -7,6 +7,10 @@ import footer from '../footer';
 
 export default class RulesView extends AbstractView {
 
+  _getUserName(input) {
+    return input.value.trim().replace(/[#//]/g, ``);
+  }
+
   get template() {
     return `\
       ${header()}
@@ -43,7 +47,7 @@ export default class RulesView extends AbstractView {
       rulesInput.disabled = true;
       this.rulesButton.disabled = true;
 
-      this.onContinueButtonClick(rulesInput.value);
+      this.onContinueButtonClick(this._getUserName(rulesInput));
     });
 
     rulesInput.addEventListener(`input`, () => {

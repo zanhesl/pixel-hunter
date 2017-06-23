@@ -19,4 +19,6 @@ class IntroPresenter {
   }
 }
 
-export default IntroPresenter;
+const instance = new IntroPresenter();
+
+export default () => instance;
