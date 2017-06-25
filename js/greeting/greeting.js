@@ -11,7 +11,7 @@ class GreetingPresenter {
 
   init() {
 
-    renderScreen(this.view);
+    renderScreen(this.view, `fadein`);
 
     this.view.onContinueButtonClick = () => {
       Application.showRules();

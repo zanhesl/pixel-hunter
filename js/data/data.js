@@ -38,12 +38,56 @@ export const typeOptions = {
   }
 };
 
-export function renderScreen(screen) {
+export function fadeinScreenAnimate(fadeinScreen, fadeoutScreen) {
+  return new Promise((resolve, reject) => {
+
+    const TIMER_TIMEOUT = 40;
+
+    fadeoutScreen.classList.add(`central--absolute`);
+    fadeoutScreen.style.zIndex = `2`;
+
+    fadeinScreen.classList.add(`central--absolute`);
+    fadeinScreen.style.zIndex = `1`;
+    fadeinScreen.style.opacity = `0`;
+
+    function decreaseOpacity(opacity) {
+
+      fadeinScreen.style.opacity = 1 - opacity;
+      fadeoutScreen.style.opacity = opacity;
+
+      opacity = ((opacity * 100 - 5) / 100).toFixed(2);
+
+      if (opacity >= 0.0) {
+        setTimeout(() => {
+          decreaseOpacity(opacity);
+        }, TIMER_TIMEOUT);
+      } else {
+        resolve();
+      }
+    }
+
+    decreaseOpacity(1.0);
+  });
+}
+
+export function renderScreen(screen, appearance) {
 
   const viewport = document.getElementById(`main`);
+  const curScreen = viewport.querySelector(`.central`);
 
-  viewport.innerHTML = ``;
-  viewport.appendChild(screen.element);
+  if (curScreen && appearance && appearance === `fadein`) {
+
+    viewport.appendChild(screen.element);
+
+    fadeinScreenAnimate(screen.element, curScreen).then(() => {
+      viewport.removeChild(curScreen);
+      screen.element.classList.remove(`central--absolute`);
+    });
+
+  } else {
+    viewport.innerHTML = ``;
+    viewport.appendChild(screen.element);
+  }
 }
 
 export function countResults(results, value) {

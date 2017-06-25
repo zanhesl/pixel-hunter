@@ -6,6 +6,14 @@
   position: relative;
   max-width: 1000px;
   margin: 0 auto;
+
+  &--absolute {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    z-index: 1;
+  }
 }
 
 .central__content {
