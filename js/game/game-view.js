@@ -8,11 +8,11 @@ import footer from '../footer';
 
 export default class GameView extends AbstractView {
 
-  constructor(state, level) {
+  constructor(state, data) {
     super();
 
     this.state = state;
-    this.level = level;
+    this.data = data;
   }
 
   _getElements(question) {
@@ -20,60 +20,64 @@ export default class GameView extends AbstractView {
   }
 
   _isAnswered() {
-    return this.level.questions.every((question) => {
-      return this._getElements(question).some((item) => item.checked);
+    return this.data.answers.every((answer, index) => {
+      return this._getElements(`question${index + 1}`)
+        .some((item) => item.checked);
     });
   }
 
-  _hasQuestions() {
-    return this.level.questions.length;
+  _hasAnswers() {
+    return this.data.hasAnswers;
   }
 
   _getAnswers() {
-    return this.level.questions.map((question, index) => {
-      return this._getElements(question)
+    return this.data.answers.map((answer, index) => {
+      return this._getElements(`question${index + 1}`)
         .find((item) => item.checked)
         .value;
     });
   }
 
   _getChoice(optionIndex) {
-    return this.level.options[optionIndex];
+    return this.data.answers[optionIndex].type;
   }
 
-  _getOptionImage(optionIndex) {
+  _setOptionImage(option, optionIndex) {
 
-    const img = this.level.img[optionIndex];
+    const imgTag = option.querySelector(`img`);
+    const image = this.data.answers[optionIndex].image;
+    const img = image.img;
+    const frame = {width: image.width, height: image.height};
 
-    const actualSize = resizeImage(this.level.frame, {
+    const actualSize = resizeImage(frame, {
       width: img.naturalWidth,
       height: img.naturalHeight
     });
 
     img.width = actualSize.width;
     img.height = actualSize.height;
-    img.alt = `Option ${optionIndex}`;
+    img.alt = `Option ${optionIndex + 1}`;
 
-    return img;
+    imgTag.parentNode.replaceChild(img, imgTag);
   }
 
-  _templateQuestion(question) {
+  _templateAnswer(index) {
     return `\
       <label class="game__answer game__answer--photo">
-        <input name="${question}" type="radio" value="photo">
+        <input name="question${index}" type="radio" value="photo">
         <span>Фото</span>
       </label>
       <label class="game__answer game__answer--paint">
-        <input name="${question}" type="radio" value="paint">
+        <input name="question${index}" type="radio" value="painting">
         <span>Рисунок</span>
       </label>`;
   }
 
-  _templateOption(question) {
+  _templateOption(index) {
     return `\
       <div class="game__option">
         <img>
-        ${(question) ? this._templateQuestion(question) : ``}
+        ${(this.data.hasAnswers) ? this._templateAnswer(index + 1) : ``}
       </div>`;
   }
 
@@ -82,10 +86,10 @@ export default class GameView extends AbstractView {
     return `\
       ${header(this.state)}
       <div class="game">
-        <p class="game__task">${this.level.title}</p>
-        <form class="${this.level.formClass}">
-          ${this.level.options.map((option, index) => {
-            return this._templateOption(this.level.questions[index]);
+        <p class="game__task">${this.data.question}</p>
+        <form class="${this.data.formClass}">
+          ${this.data.answers.map((answer, index) => {
+            return this._templateOption(index);
           }).join(``)}
         </form>
         <div class="stats">
@@ -116,18 +120,15 @@ export default class GameView extends AbstractView {
 
     Array.from(gameOptions).forEach((option, optionIndex) => {
 
-      const optionImgTag = option.querySelector(`img`);
-      const optionImg = this._getOptionImage(optionIndex);
-
-      optionImgTag.parentNode.replaceChild(optionImg, optionImgTag);
+      this._setOptionImage(option, optionIndex);
 
       option.addEventListener(`click`, (evt) => {
 
-        if (this._hasQuestions() && this._isAnswered()) {
+        if (this._hasAnswers() && this._isAnswered()) {
           this.onAnswered(this.gameTime, this._getAnswers());
         }
 
-        if (!this._hasQuestions()) {
+        if (!this._hasAnswers()) {
           this.onChosen(this.gameTime, this._getChoice(optionIndex));
         }
       });

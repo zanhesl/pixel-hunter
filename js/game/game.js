@@ -3,14 +3,13 @@ import {renderScreen} from '../data/data';
 import {getLevelResult} from '../data/data';
 import {state as initState} from '../data/data';
 import {rules} from '../data/data';
-import {types} from '../data/data';
-import Levels from '../data/data-levels';
 import GameView from './game-view';
 import Application from '../application';
 
 
 class GamePresenter {
   constructor(userName) {
+    this.data = Application.data;
 
     this.state = Object.assign({}, initState, {
       name: userName,
@@ -23,13 +22,8 @@ class GamePresenter {
   }
 
   _createGameView() {
-
-    this.level = Levels.getLevel(this.state.level);
-
-    this.view = new GameView(this.state, Object.assign({},
-        this.level,
-        types[this.level.type]
-    ));
+    this.level = this.data[this.state.level];
+    this.view = new GameView(this.state, this.level);
   }
 
   _startGame() {
@@ -65,7 +59,7 @@ class GamePresenter {
 
   _nextGame() {
 
-    if ((this.state.lives >= 0) && (this.state.level + 1) < Levels.count) {
+    if ((this.state.lives >= 0) && ((this.state.level + 1) < this.data.length)) {
 
       this.state.level++;
 
@@ -73,18 +67,23 @@ class GamePresenter {
       this.init();
 
     } else {
-      Application.showStats([this.state.name, ...this.state.results]);
+      Application.showStats({name: this.state.name, results: this.state.results});
     }
   }
 
   _isQuestionsAnswerRight(answers) {
     return answers.map((answer, index) => {
-      return answer === this.level.options[index];
+      return answer === this.level.answers[index].type;
     }).every((answer) => answer);
   }
 
   _isChoosenAnswerRight(answer) {
-    return answer === types[this.level.type].choose;
+
+    const isShouldChoosePhoto = this.level.answers.filter((it) => {
+      return it.type === `photo`;
+    }).length === 1;
+
+    return answer === ((isShouldChoosePhoto) ? `photo` : `painting`);
   }
 
   init() {
@@ -108,4 +107,4 @@ class GamePresenter {
   }
 }
 
-export default (state) => new GamePresenter(state);
+export default (args = {name: `Unknown`}) => new GamePresenter(args.name);

@@ -5,7 +5,7 @@ import Application from '../application';
 
 
 class StatsPresenter {
-  constructor(userName = `Unknown`, results) {
+  constructor(userName, results) {
     this.view = new StatsView(userName, results);
   }
 
@@ -19,4 +19,7 @@ class StatsPresenter {
   }
 }
 
-export default (userName, ...results) => new StatsPresenter(userName, results);
+export default (args = {name: `Unknown`, results: ``}) => {
+
+  return new StatsPresenter(args.name, args.results.split(`,`));
+};

@@ -17,7 +17,48 @@ export function resizeImage(frame, given) {
   };
 }
 
-export function loadImage(src, onLoadCompleted) {
+export function loadImage(src) {
+  return new Promise((resolve, reject) => {
+
+    let timeout = null;
+
+    const img = new Image();
+    const TIMEOUT_DELAY = 8000;
+
+    img.onload = () => {
+      clearTimeout(timeout);
+      resolve(img);
+    };
+
+    img.onerror = () => {
+      clearTimeout(timeout);
+      reject(new Error(`Loading of image [${src}] is aborted with error`));
+    };
+
+    timeout = setTimeout(() => {
+      clearTimeout(timeout);
+
+      img.src = ``;
+      reject(new Error(`Loading timeout of image [${src}] is expired`));
+
+    }, TIMEOUT_DELAY);
+
+    img.src = src;
+  });
+}
+
+export function loadImages(sources) {
+
+  const images = [];
+
+  sources.forEach((src) => {
+    images.push(loadImage(src));
+  });
+
+  return Promise.all(images);
+}
+
+export function _loadImage(src, onLoadCompleted) {
 
   let timeout = null;
 
@@ -49,7 +90,7 @@ export function loadImage(src, onLoadCompleted) {
   img.src = src;
 }
 
-export function loadImages(srcArray, onLoadCompleted) {
+export function _loadImages(srcArray, onLoadCompleted) {
 
   const imgs = [];
 
@@ -57,7 +98,7 @@ export function loadImages(srcArray, onLoadCompleted) {
 
   srcArray.forEach((src, index) => {
 
-    loadImage(src, (img) => {
+    _loadImage(src, (img) => {
 
       imgs[index] = img;
       count--;
