@@ -12,10 +12,11 @@ import footer from '../footer';
 
 export default class StatsView extends AbstractView {
 
-  constructor(state) {
+  constructor(name, results) {
     super();
-    this.state = state;
-    this.stats = [this.state.results, ...dataResults];
+    this.name = name;
+    this.results = results;
+    this.stats = [this.results, ...dataResults];
   }
 
   _isGameFailed(results) {
@@ -78,7 +79,7 @@ export default class StatsView extends AbstractView {
     return `\
       ${header()}
       <div class="result">
-        <h1>${(this._isGameFailed(this.state.results)) ? `Fail` : `Победа!`}</h1>
+        <h1>${(this._isGameFailed(this.results)) ? `Fail` : `Победа!`}</h1>
         ${this.stats.map((results, index) => {
           return this._templateTableResults(index + 1, results);
         }).join(``)}

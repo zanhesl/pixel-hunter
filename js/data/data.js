@@ -1,14 +1,4 @@
 
-import Levels from './data-levels';
-
-
-const extraPoints = {
-  fast: `Бонус за скорость:`,
-  heart: `Бонус за жизни:`,
-  slow: `Штраф за медлительность:`
-};
-
-
 export const rules = Object.freeze({
   gameTime: 30,
   slowTime: 20,
@@ -22,7 +12,7 @@ export const rules = Object.freeze({
     heart: 50
   }),
   maxLives: 3,
-  levelsCount: Levels.count
+  levelsCount: 10
 });
 
 export const state = Object.freeze({
@@ -33,31 +23,20 @@ export const state = Object.freeze({
   results: Object.freeze(new Array(rules.levelsCount).fill(`unknown`))
 });
 
-export const types = [
-  {
-    title: `Угадайте для каждого изображения фото или рисунок?`,
+export const typeOptions = {
+  'two-of-two': {
     formClass: `game__content`,
-    frame: {width: 468, height: 458},
-    questions: [`question1`, `question2`]
-  }, {
-    title: `Угадай, фото или рисунок?`,
+    hasAnswers: true
+  },
+  'tinder-like': {
     formClass: `game__content  game__content--wide`,
-    frame: {width: 705, height: 455},
-    questions: [`question1`]
-  }, {
-    title: `Найдите рисунок среди изображений`,
+    hasAnswers: true
+  },
+  'one-of-three': {
     formClass: `game__content  game__content--triple`,
-    frame: {width: 304, height: 455},
-    questions: [],
-    choose: `paint`
-  }, {
-    title: `Найдите фото среди изображений`,
-    formClass: `game__content  game__content--triple`,
-    frame: {width: 304, height: 455},
-    questions: [],
-    choose: `photo`
-  }];
-
+    hasAnswers: false
+  }
+};
 
 export function renderScreen(screen) {
 
@@ -98,6 +77,13 @@ export function getPoints(results) {
     return Math.abs(rules.points[result]);
   }).length * rules.points.correct;
 }
+
+
+const extraPoints = {
+  fast: `Бонус за скорость:`,
+  heart: `Бонус за жизни:`,
+  slow: `Штраф за медлительность:`
+};
 
 export function getTotalPoints(results) {
   return getPoints(results) + Object.keys(extraPoints).map((key) => {

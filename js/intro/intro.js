@@ -1,7 +1,6 @@
 
 import {renderScreen} from '../data/data';
 import IntroView from './intro-view';
-import Application from '../application';
 
 
 class IntroPresenter {
@@ -10,13 +9,10 @@ class IntroPresenter {
   }
 
   init() {
-
     renderScreen(this.view);
-
-    this.view.onContinueButtonClick = () => {
-      Application.showGreeting();
-    };
   }
 }
 
-export default IntroPresenter;
+const instance = new IntroPresenter();
+
+export default () => instance;

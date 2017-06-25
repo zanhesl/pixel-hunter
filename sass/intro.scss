@@ -19,6 +19,11 @@
   position: relative;
   top: 220px;
   left: 30px;
+  animation: spin;
+  animation-duration: 5s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  transform-origin: center -5px;
 
   &:hover {
     color: $link-hover-color;
@@ -35,3 +40,13 @@
   position: absolute;
   bottom: 0;
 }
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
