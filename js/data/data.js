@@ -41,10 +41,14 @@ export const typeOptions = {
 export function fadeinScreenAnimate(fadeinScreen, fadeoutScreen) {
   return new Promise((resolve, reject) => {
 
-    const TIMER_TIMEOUT = 40;
+    const ANIMATION_FPS = 25;
+    const ANIMATION_DURATION = 2;
+    const ANIMATION_TIMEOUT = 1000 / ANIMATION_FPS;
+    const ANIMATION_DELTA = 1 / (ANIMATION_FPS * ANIMATION_DURATION);
 
     fadeoutScreen.classList.add(`central--absolute`);
     fadeoutScreen.style.zIndex = `2`;
+    fadeinScreen.style.opacity = `1`;
 
     fadeinScreen.classList.add(`central--absolute`);
     fadeinScreen.style.zIndex = `1`;
@@ -52,15 +56,15 @@ export function fadeinScreenAnimate(fadeinScreen, fadeoutScreen) {
 
     function decreaseOpacity(opacity) {
 
-      fadeinScreen.style.opacity = 1 - opacity;
+      fadeinScreen.style.opacity = (1 - opacity);
       fadeoutScreen.style.opacity = opacity;
 
-      opacity = ((opacity * 100 - 5) / 100).toFixed(2);
+      opacity = (opacity - ANIMATION_DELTA).toFixed(2);
 
       if (opacity >= 0.0) {
         setTimeout(() => {
           decreaseOpacity(opacity);
-        }, TIMER_TIMEOUT);
+        }, ANIMATION_TIMEOUT);
       } else {
         resolve();
       }
