@@ -19,6 +19,10 @@ class GamePresenter {
     this.gameTimer = null;
 
     this._createGameView();
+
+    this._onAsnweredHandler = this._onAsnweredHandler.bind(this);
+    this._onChosenHandler = this._onChosenHandler.bind(this);
+    this._onBackButtonClickHandler = this._onBackButtonClickHandler.bind(this);
   }
 
   _createGameView() {
@@ -90,20 +94,26 @@ class GamePresenter {
 
     renderScreen(this.view);
 
-    this.view.onAnswered = (time, answers) => {
-      this._endGame(time, this._isQuestionsAnswerRight(answers));
-    };
-
-    this.view.onChosen = (time, answer) => {
-      this._endGame(time, this._isChoosenAnswerRight(answer));
-    };
-
-    this.view.onBackButtonClick = () => {
-      clearInterval(this.gameTimer);
-      Application.showGreeting();
-    };
+    this.view.onAnswered = this._onAsnweredHandler;
+    this.view.onChosen = this._onChosenHandler;
+    this.view.onBackButtonClick = this._onBackButtonClickHandler;
 
     this._startGame();
+  }
+
+  _onAsnweredHandler(time, answers) {
+    this._endGame(time, this._isQuestionsAnswerRight(answers));
+  }
+
+  _onChosenHandler(time, answer) {
+    this._endGame(time, this._isChoosenAnswerRight(answer));
+  }
+
+  _onBackButtonClickHandler() {
+
+    clearInterval(this.gameTimer);
+
+    Application.showGreeting();
   }
 }
 

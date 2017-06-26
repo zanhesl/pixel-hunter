@@ -13,7 +13,44 @@ export default class GameView extends AbstractView {
 
     this.state = state;
     this.data = data;
+
+    this._onQuestionChangeHandler = this._onQuestionChangeHandler.bind(this);
   }
+
+
+  get template() {
+    return `\
+      ${header(this.state)}
+      <div class="game">
+        <p class="game__task">${this.data.question}</p>
+        <form class="${this.data.formClass}">
+          ${this.data.answers.map((answer, index) => {
+            return this._templateOption(index);
+          }).join(``)}
+        </form>
+        <div class="stats">
+          <ul class="stats">
+            ${this.state.results.map((result) => {
+              return `<li class="stats__result stats__result--${result}"></li>`;
+            }).join(``)}
+          </ul>
+        </div>
+      </div>
+      ${footer()}`;
+  }
+
+  get gameTime() {
+    return rules.gameTime - parseInt(this.gameTimer.textContent, 10);
+  }
+
+  set gameTime(time) {
+
+    const isWarningTime = (time <= rules.warningTime);
+
+    this.gameTimer.textContent = time;
+    this.gameTimer.classList.toggle(`game__timer--blink`, isWarningTime);
+  }
+
 
   _getElements(question) {
     return Array.from(this.gameContent.elements[question]);
@@ -61,7 +98,7 @@ export default class GameView extends AbstractView {
     imgTag.parentNode.replaceChild(img, imgTag);
   }
 
-  _onQuestionChange(evt) {
+  _onQuestionChangeHandler(evt) {
 
     const questions = this._getElements(evt.currentTarget.name);
 
@@ -91,39 +128,6 @@ export default class GameView extends AbstractView {
   }
 
 
-  get template() {
-    return `\
-      ${header(this.state)}
-      <div class="game">
-        <p class="game__task">${this.data.question}</p>
-        <form class="${this.data.formClass}">
-          ${this.data.answers.map((answer, index) => {
-            return this._templateOption(index);
-          }).join(``)}
-        </form>
-        <div class="stats">
-          <ul class="stats">
-            ${this.state.results.map((result) => {
-              return `<li class="stats__result stats__result--${result}"></li>`;
-            }).join(``)}
-          </ul>
-        </div>
-      </div>
-      ${footer()}`;
-  }
-
-  get gameTime() {
-    return rules.gameTime - parseInt(this.gameTimer.textContent, 10);
-  }
-
-  set gameTime(time) {
-
-    const isWarningTime = (time <= rules.warningTime);
-
-    this.gameTimer.textContent = time;
-    this.gameTimer.classList.toggle(`game__timer--blink`, isWarningTime);
-  }
-
   bind() {
 
     this.gameContent = this.element.querySelector(`.game__content`);
@@ -141,7 +145,7 @@ export default class GameView extends AbstractView {
         const questions = this._getElements(`question${optionIndex + 1}`);
 
         Array.from(questions).forEach((item) => {
-          item.addEventListener(`change`, this._onQuestionChange.bind(this));
+          item.addEventListener(`change`, this._onQuestionChangeHandler);
         });
       }
 
@@ -164,6 +168,7 @@ export default class GameView extends AbstractView {
       this.onBackButtonClick();
     });
   }
+
 
   onAnswered(time, answers) {
 

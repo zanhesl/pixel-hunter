@@ -1,7 +1,7 @@
 
 import AbstractView from '../view';
 import {rules} from '../data/data';
-import {countResults} from '../data/data';
+import {getLivesCount} from '../data/data';
 import {getPoints} from '../data/data';
 import {getExtraPointsList} from '../data/data';
 import {getTotalPoints} from '../data/data';
@@ -20,17 +20,17 @@ export default class StatsView extends AbstractView {
   }
 
   _isGameFailed(results) {
-    return (rules.maxLives - countResults(results, `wrong`)) < 0;
+    return (getLivesCount(results) === 0);
   }
 
   _templateBonus(bonus) {
     return (bonus.count === 0) ? `` : `\
       <tr>
         <td></td>
-        <td class="result__extra">${bonus.title}</td>
-        <td class="result__extra">${bonus.count}&nbsp;<span class="stats__result stats__result--${bonus.name}"></span></td>
+        <td class="result__extra">${bonus.label}</td>
+        <td class="result__extra">${bonus.count}&nbsp;<span class="stats__result stats__result--${bonus.key}"></span></td>
         <td class="result__points">×&nbsp;${bonus.points}</td>
-        <td class="result__total">${bonus.totalPoints}</td>
+        <td class="result__total">${bonus.total}</td>
       </tr>`;
   }
 

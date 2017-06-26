@@ -1,27 +1,37 @@
 
-export const rules = Object.freeze({
+const Result = Object.freeze({
+  CORRECT: `correct`,
+  WRONG: `wrong`,
+  FAST: `fast`,
+  SLOW: `slow`,
+  UNKNOWN: `unknown`
+});
+
+export const rules = {
   gameTime: 30,
   warningTime: 5,
   slowTime: 20,
   quickTime: 10,
-  points: Object.freeze({
+  points: {
     correct: 100,
-    fast: 50,
-    slow: -50,
     wrong: 0,
     unknown: 0,
-    heart: 50
-  }),
+    extra: {
+      fast: {label: `Бонус за скорость:`, points: 50},
+      heart: {label: `Бонус за жизни:`, points: 50},
+      slow: {label: `Штраф за медлительность:`, points: -50}
+    }
+  },
   maxLives: 3,
   levelsCount: 10
-});
+};
 
 export const state = Object.freeze({
   level: 0,
   levels: [],
   lives: rules.maxLives,
   name: `Unknown`,
-  results: Object.freeze(new Array(rules.levelsCount).fill(`unknown`))
+  results: Object.freeze(new Array(rules.levelsCount).fill(Result.UNKNOWN))
 });
 
 export const typeOptions = {
@@ -96,70 +106,77 @@ export function renderScreen(screen, appearance) {
 }
 
 export function countResults(results, value) {
-  return results.filter((result) => result === value).length;
+
+  let count = 0;
+
+  if (value === `heart`) {
+    count = rules.maxLives - results.filter((item) => (item === Result.WRONG)).length;
+    count = (count < 0) ? 0 : count;
+  } else {
+    count = results.filter((item) => (item === value)).length;
+  }
+
+  return count;
 }
 
 export function getLevelResult(levelTime, levelPassed) {
 
+  let result = Result.UNKNOWN;
+
   if (!levelPassed || levelTime < 0) {
-    return `wrong`;
+    result = Result.WRONG;
   } else if (levelPassed && levelTime < rules.quickTime) {
-    return `fast`;
+    result = Result.FAST;
   } else if (levelPassed && levelTime > rules.slowTime) {
-    return `slow`;
+    result = Result.SLOW;
   } else if (levelPassed) {
-    return `correct`;
+    result = Result.CORRECT;
   } else {
-    return `wrong`;
+    result = Result.WRONG;
   }
+
+  return result;
 }
 
 export function getLivesCount(results) {
-
-  const lives = rules.maxLives - countResults(results, `wrong`);
-
-  return (lives < 0) ? 0 : lives;
+  return countResults(results, `heart`);
 }
 
 export function getPoints(results) {
   return results.filter((result) => {
-    return Math.abs(rules.points[result]);
+
+    const extraItem = rules.points.extra[result];
+
+    return rules.points[result] || (extraItem && Math.abs(extraItem.points));
+
   }).length * rules.points.correct;
 }
 
-
-const extraPoints = {
-  fast: `Бонус за скорость:`,
-  heart: `Бонус за жизни:`,
-  slow: `Штраф за медлительность:`
-};
-
 export function getTotalPoints(results) {
-  return getPoints(results) + Object.keys(extraPoints).map((key) => {
 
-    const keyCount = (key === `heart`)
-      ? getLivesCount(results)
-      : countResults(results, key);
+  const extraPoints = Object.keys(rules.points.extra).map((key) => {
 
-    return keyCount * rules.points[key];
+    const extraItem = rules.points.extra[key];
+    const count = countResults(results, key);
+
+    return count * extraItem.points;
 
   }).reduce((pValue, cValue) => pValue + cValue);
+
+
+  return getPoints(results) + extraPoints;
 }
 
 export function getExtraPointsList(results) {
 
-  return Object.keys(extraPoints).map((key) => {
+  return Object.keys(rules.points.extra).map((key) => {
 
-    const keyCount = (key === `heart`)
-      ? getLivesCount(results)
-      : countResults(results, key);
+    const extraItem = rules.points.extra[key];
+    const count = countResults(results, key);
+    const label = extraItem.label;
+    const points = Math.abs(extraItem.points);
+    const total = count * extraItem.points;
 
-    return {
-      name: key,
-      title: extraPoints[key],
-      count: keyCount,
-      points: Math.abs(rules.points[key]),
-      totalPoints: keyCount * rules.points[key]
-    };
+    return {key, count, label, points, total};
   });
 }

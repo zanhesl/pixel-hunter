@@ -10,19 +10,18 @@ export default new class extends DefaultAdapter {
 
     const imageLoaders = [];
 
-    data.forEach((item) => {
+    for (const item of data) {
 
       item.formClass = typeOptions[item.type].formClass;
       item.hasAnswers = typeOptions[item.type].hasAnswers;
 
-      item.answers.forEach((answer) => {
+      for (const answer of item.answers) {
 
-        imageLoaders.push(loadImage(answer.image.url)
-          .then((img) => {
-            answer.image.img = img;
-          }));
-      });
-    });
+        imageLoaders.push(loadImage(answer.image.url).then((img) => {
+          answer.image.img = img;
+        }));
+      }
+    }
 
     return Promise.all(imageLoaders).then(() => data);
   }

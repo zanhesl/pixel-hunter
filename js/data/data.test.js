@@ -150,26 +150,26 @@ describe(`Game`, () => {
       const tests = [{
         results: [`correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`],
         count: 0,
-        totalPoints: 0
+        total: 0
       }, {
         results: [`correct`, `correct`, `fast`, `slow`, `correct`, `fast`, `slow`, `correct`, `correct`, `fast`],
         count: 3,
-        totalPoints: 150
+        total: 150
       }, {
         results: [`fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`],
         count: 10,
-        totalPoints: 500
+        total: 500
       }, {
         results: [`correct`, `correct`, `fast`, `slow`, `correct`, `slow`, `slow`, `correct`, `correct`, `fast`],
         count: 2,
-        totalPoints: 100
+        total: 100
       }];
 
       function runTest(test) {
         const pointsList = data.getExtraPointsList(test.results);
 
         assert.equal(pointsList[0].count, test.count);
-        assert.equal(pointsList[0].totalPoints, test.totalPoints);
+        assert.equal(pointsList[0].total, test.total);
       }
 
       tests.forEach(runTest);
@@ -180,26 +180,26 @@ describe(`Game`, () => {
       const tests = [{
         results: [`correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`],
         count: 3,
-        totalPoints: 150
+        total: 150
       }, {
         results: [`correct`, `wrong`, `fast`, `slow`, `correct`, `fast`, `slow`, `wrong`, `correct`, `fast`],
         count: 1,
-        totalPoints: 50
+        total: 50
       }, {
         results: [`wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`],
         count: 0,
-        totalPoints: 0
+        total: 0
       }, {
         results: [`correct`, `correct`, `fast`, `slow`, `correct`, `slow`, `slow`, `correct`, `correct`, `fast`],
         count: 3,
-        totalPoints: 150
+        total: 150
       }];
 
       function runTest(test) {
         const pointsList = data.getExtraPointsList(test.results);
 
         assert.equal(pointsList[1].count, test.count);
-        assert.equal(pointsList[1].totalPoints, test.totalPoints);
+        assert.equal(pointsList[1].total, test.total);
       }
 
       tests.forEach(runTest);
@@ -210,26 +210,26 @@ describe(`Game`, () => {
       const tests = [{
         results: [`correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`],
         count: 0,
-        totalPoints: 0
+        total: 0
       }, {
         results: [`correct`, `correct`, `fast`, `slow`, `correct`, `fast`, `slow`, `correct`, `correct`, `fast`],
         count: 2,
-        totalPoints: -100
+        total: -100
       }, {
         results: [`slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`],
         count: 10,
-        totalPoints: -500
+        total: -500
       }, {
         results: [`correct`, `correct`, `fast`, `slow`, `correct`, `slow`, `slow`, `correct`, `correct`, `fast`],
         count: 3,
-        totalPoints: -150
+        total: -150
       }];
 
       function runTest(test) {
         const pointsList = data.getExtraPointsList(test.results);
 
         assert.equal(pointsList[2].count, test.count);
-        assert.equal(pointsList[2].totalPoints, test.totalPoints);
+        assert.equal(pointsList[2].total, test.total);
       }
 
       tests.forEach(runTest);
