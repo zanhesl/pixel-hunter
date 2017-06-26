@@ -15,6 +15,14 @@
   top: 25px;
   left: 50%;
   transform: translateX(-50%);
+
+  &--blink {
+    animation: blink;
+    animation-duration: 1.0s;
+    animation-direction: alternate;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
 }
 
 .game__lives {
@@ -141,4 +149,13 @@
     z-index: 1;
   }
 
+}
+
+@keyframes blink {
+  from {
+    opacity: 1.0;
+  }
+  to {
+    opacity: 0.0;
+  }
 }

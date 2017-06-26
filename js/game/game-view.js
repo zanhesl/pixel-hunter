@@ -61,6 +61,15 @@ export default class GameView extends AbstractView {
     imgTag.parentNode.replaceChild(img, imgTag);
   }
 
+  _onQuestionChange(evt) {
+
+    const questions = this._getElements(evt.currentTarget.name);
+
+    Array.from(questions).forEach((question) => {
+      question.disabled = true;
+    });
+  }
+
   _templateAnswer(index) {
     return `\
       <label class="game__answer game__answer--photo">
@@ -108,7 +117,11 @@ export default class GameView extends AbstractView {
   }
 
   set gameTime(time) {
+
+    const isWarningTime = (time <= rules.warningTime);
+
     this.gameTimer.textContent = time;
+    this.gameTimer.classList.toggle(`game__timer--blink`, isWarningTime);
   }
 
   bind() {
@@ -118,9 +131,19 @@ export default class GameView extends AbstractView {
 
     const gameOptions = this.gameContent.querySelectorAll(`.game__option`);
 
+
     Array.from(gameOptions).forEach((option, optionIndex) => {
 
       this._setOptionImage(option, optionIndex);
+
+      if (this._hasAnswers()) {
+
+        const questions = this._getElements(`question${optionIndex + 1}`);
+
+        Array.from(questions).forEach((item) => {
+          item.addEventListener(`change`, this._onQuestionChange.bind(this));
+        });
+      }
 
       option.addEventListener(`click`, (evt) => {
 

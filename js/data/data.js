@@ -1,6 +1,7 @@
 
 export const rules = Object.freeze({
   gameTime: 30,
+  warningTime: 5,
   slowTime: 20,
   quickTime: 10,
   points: Object.freeze({
@@ -42,7 +43,7 @@ export function fadeinScreenAnimate(fadeinScreen, fadeoutScreen) {
   return new Promise((resolve, reject) => {
 
     const ANIMATION_FPS = 25;
-    const ANIMATION_DURATION = 2;
+    const ANIMATION_DURATION = 1;
     const ANIMATION_TIMEOUT = 1000 / ANIMATION_FPS;
     const ANIMATION_DELTA = 1 / (ANIMATION_FPS * ANIMATION_DURATION);
 
