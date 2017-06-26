@@ -17,9 +17,11 @@ export default new class extends DefaultAdapter {
 
       for (const answer of item.answers) {
 
-        imageLoaders.push(loadImage(answer.image.url).then((img) => {
+        const loader = loadImage(answer.image.url).then((img) => {
           answer.image.img = img;
-        }));
+        });
+
+        imageLoaders.push(loader);
       }
     }
 

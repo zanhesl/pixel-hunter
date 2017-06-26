@@ -19,7 +19,7 @@ const PresenterID = {
 class Application {
   constructor() {
 
-    this.showIntro();
+    this.presenter = this.showIntro();
 
     this.model = new class extends Model {
       get urlRead() {
@@ -69,7 +69,10 @@ class Application {
   }
 
   _changePresenter(hash) {
-    this.routes[hash.route](hash.args).init();
+    //this.presenter.destroy();
+    //let previous = this.presenter;
+    this.presenter = this.routes[hash.route](hash.args);
+    this.presenter.init();
   }
 
   _setup(data) {

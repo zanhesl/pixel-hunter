@@ -149,6 +149,9 @@
     z-index: 1;
   }
 
+  &::after {
+    z-index: 1;
+  }
 }
 
 @keyframes blink {

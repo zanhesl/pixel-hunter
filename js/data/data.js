@@ -8,7 +8,7 @@ const Result = Object.freeze({
 });
 
 export const rules = {
-  gameTime: 30,
+  gameTime: 1330,
   warningTime: 5,
   slowTime: 20,
   quickTime: 10,

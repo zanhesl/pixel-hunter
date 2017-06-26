@@ -37,31 +37,28 @@ export default class RulesView extends AbstractView {
 
     const backButton = this.element.querySelector(`.header__back`);
     const rulesForm = this.element.querySelector(`.rules__form`);
-    const rulesInput = rulesForm.querySelector(`.rules__input`);
 
+    this.rulesInput = rulesForm.querySelector(`.rules__input`);
     this.rulesButton = rulesForm.querySelector(`.rules__button`);
+
 
     rulesForm.addEventListener(`submit`, (evt) => {
       evt.preventDefault();
 
-      rulesInput.disabled = true;
+      this.rulesInput.disabled = true;
       this.rulesButton.disabled = true;
 
-      this.onContinueButtonClick(this._getUserName(rulesInput));
+      this.onContinueButtonClick(this._getUserName(this.rulesInput));
     });
 
-    rulesInput.addEventListener(`input`, () => {
-      this.rulesButton.disabled = (rulesInput.value.length === 0);
+    this.rulesInput.addEventListener(`input`, () => {
+      this.rulesButton.disabled = (this.rulesInput.value.length === 0);
     });
 
     backButton.addEventListener(`click`, (evt) => {
       evt.preventDefault();
       this.onBackButtonClick();
     });
-  }
-
-  setProgress(progress) {
-    this.rulesButton.textContent = `${progress}%`;
   }
 
   onContinueButtonClick(userName) {
