@@ -1,5 +1,5 @@
 
-import {typeOptions} from './data';
+import {typeOptions} from '../data/data';
 import {loadImage} from '../utils';
 import {DefaultAdapter} from '../adapter';
 
@@ -18,7 +18,7 @@ export default new class extends DefaultAdapter {
       for (const answer of item.answers) {
 
         const loader = loadImage(answer.image.url).then((img) => {
-          answer.image.img = img;
+          answer.image.tag = img;
         });
 
         imageLoaders.push(loader);

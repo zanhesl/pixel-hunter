@@ -20,12 +20,11 @@ export default class Model {
   send(data, adapter = defaultAdapter) {
 
     const requestSettings = {
-      body: adapter.toServer(data),
+      body: JSON.stringify(adapter.toServer(data)),
       headers: {'Content-Type': `application/json`},
       method: `POST`
     };
 
-    return fetch(this.urlWrite, requestSettings)
-      .then(this.onUpload);
+    return fetch(this.urlWrite, requestSettings);
   }
 }

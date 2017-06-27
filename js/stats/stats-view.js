@@ -12,11 +12,11 @@ import footer from '../footer';
 
 export default class StatsView extends AbstractView {
 
-  constructor(name, results) {
+  constructor(stats) {
     super();
-    this.name = name;
-    this.results = results;
-    this.stats = [this.results, ...dataResults];
+
+    this.results = stats[0] || [];
+    this.stats = stats;
   }
 
   _isGameFailed(results) {

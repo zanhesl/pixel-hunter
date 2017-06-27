@@ -127,10 +127,13 @@
 }
 
 .game__content--triple .game__option {
+  position: relative;
   cursor: pointer;
 
   width: 304px;
   height: 455px;
+
+  z-index: 10;
 
   &:hover {
     border-color: #df4e4e;
@@ -146,13 +149,14 @@
     height: 100%;
 
     background-color: rgba(223, 78, 78, 0.4);
-    z-index: 1;
+    //z-index: 1;
   }
 
   &::after {
     z-index: 1;
   }
 }
+
 
 @keyframes blink {
   from {

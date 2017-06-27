@@ -1,6 +1,5 @@
 
-import Model from './model';
-import dataAdapter from './data/data-adapter';
+import gameModel from './models/game-model';
 import introPresenter from './intro/intro';
 import greetingPresenter from './greeting/greeting';
 import rulesPresenter from './rules/rules';
@@ -19,20 +18,20 @@ const PresenterID = {
 class Application {
   constructor() {
 
-    this.presenter = this.showIntro();
+    this.showIntro();
 
-    this.model = new class extends Model {
-      get urlRead() {
-        return `https://intensive-ecmascript-server-btfgudlkpi.now.sh/pixel-hunter/questions`;
-      }
+    this.routes = {
+      [PresenterID.GREETING]: greetingPresenter,
+      [PresenterID.RULES]: rulesPresenter,
+      [PresenterID.GAME]: gamePresenter,
+      [PresenterID.STATS]: statsPresenter
+    };
 
-      get urlWrite() {
-        return ``;
-      }
-    }();
+    window.onhashchange = () => {
+      this._changePresenter(this._parseLocationHash());
+    };
 
-    this.model.load(dataAdapter)
-      .then((data) => this._setup(data))
+    gameModel.load()
       .then(() => this._changePresenter(this._parseLocationHash()))
       .catch(window.console.error);
   }
@@ -75,21 +74,6 @@ class Application {
     this.presenter.init();
   }
 
-  _setup(data) {
-
-    this.data = data;
-
-    this.routes = {
-      [PresenterID.GREETING]: greetingPresenter,
-      [PresenterID.RULES]: rulesPresenter,
-      [PresenterID.GAME]: gamePresenter,
-      [PresenterID.STATS]: statsPresenter
-    };
-
-    window.onhashchange = () => {
-      this._changePresenter(this._parseLocationHash());
-    };
-  }
 
   showIntro() {
     introPresenter().init();

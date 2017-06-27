@@ -12,7 +12,11 @@ export default class GameView extends AbstractView {
     super();
 
     this.state = state;
-    this.data = data;
+
+    this.question = data.question;
+    this.answers = data.answers;
+    this.formClass = data.formClass;
+    this.hasAnswers = data.hasAnswers;
 
     this._onAnswerChangeHandler = this._onAnswerChangeHandler.bind(this);
   }
@@ -22,9 +26,9 @@ export default class GameView extends AbstractView {
     return `\
       ${header(this.state)}
       <div class="game">
-        <p class="game__task">${this.data.question}</p>
-        <form class="${this.data.formClass}">
-          ${this.data.answers.map((answer, index) => {
+        <p class="game__task">${this.question}</p>
+        <form class="${this.formClass}">
+          ${this.answers.map((answer, index) => {
             return this._templateOption(index);
           }).join(``)}
         </form>
@@ -64,26 +68,25 @@ export default class GameView extends AbstractView {
   }
 
   _getChoice(optionIndex) {
-    return this.data.answers[optionIndex].type;
+    return this.answers[optionIndex].type;
   }
 
   _setOptionImage(option, optionIndex) {
 
     const imgTag = option.querySelector(`img`);
-    const image = this.data.answers[optionIndex].image;
-    const img = image.img;
+    const image = this.answers[optionIndex].image;
     const frame = {width: image.width, height: image.height};
 
     const actualSize = resizeImage(frame, {
-      width: img.naturalWidth,
-      height: img.naturalHeight
+      width: image.tag.naturalWidth,
+      height: image.tag.naturalHeight
     });
 
-    img.width = actualSize.width;
-    img.height = actualSize.height;
-    img.alt = `Option ${optionIndex + 1}`;
+    image.tag.width = actualSize.width;
+    image.tag.height = actualSize.height;
+    image.tag.alt = `Option ${optionIndex + 1}`;
 
-    imgTag.parentNode.replaceChild(img, imgTag);
+    imgTag.parentNode.replaceChild(image.tag, imgTag);
   }
 
   _onAnswerChangeHandler(evt) {
@@ -112,7 +115,7 @@ export default class GameView extends AbstractView {
     return `\
       <div class="game__option">
         <img>
-        ${(this.data.hasAnswers) ? this._templateAnswer(index + 1) : ``}
+        ${(this.hasAnswers) ? this._templateAnswer(index + 1) : ``}
       </div>`;
   }
 
@@ -122,11 +125,9 @@ export default class GameView extends AbstractView {
     this.gameTimer = this.element.querySelector(`.game__timer`);
     this.gameContent = this.element.querySelector(`.game__content`);
 
-    if (this.data.hasAnswers) {
-      this.questions = this.data.answers.map((answer, index) => {
-        return Array.from(this.gameContent.elements[`question${index + 1}`]);
-      });
-    }
+    this.questions = this.answers.map((answer, index) => {
+      return Array.from(this.gameContent.elements[`question${index + 1}`] || []);
+    });
 
 
     const gameOptions = this.gameContent.querySelectorAll(`.game__option`);
@@ -135,7 +136,7 @@ export default class GameView extends AbstractView {
 
       this._setOptionImage(option, index);
 
-      if (this.data.hasAnswers) {
+      if (this.hasAnswers) {
         for (const it of this.questions[index]) {
           it.addEventListener(`change`, this._onAnswerChangeHandler);
         }
@@ -143,14 +144,14 @@ export default class GameView extends AbstractView {
 
       option.addEventListener(`click`, (evt) => {
 
-        if (this.data.hasAnswers && this._isAnswered()) {
+        if (this.hasAnswers && this._isAnswered()) {
           this.onAnswered(this.gameTime, this._getAnswers());
         }
 
-        if (!this.data.hasAnswers) {
+        if (!this.hasAnswers) {
           this.onChosen(this.gameTime, this._getChoice(index));
         }
-      });
+      }, true);
     });
 
     const backButton = this.element.querySelector(`.header__back`);

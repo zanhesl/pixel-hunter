@@ -8,7 +8,7 @@ const Result = Object.freeze({
 });
 
 export const rules = {
-  gameTime: 1330,
+  gameTime: 30,
   warningTime: 5,
   slowTime: 20,
   quickTime: 10,
@@ -17,9 +17,18 @@ export const rules = {
     wrong: 0,
     unknown: 0,
     extra: {
-      fast: {label: `Бонус за скорость:`, points: 50},
-      heart: {label: `Бонус за жизни:`, points: 50},
-      slow: {label: `Штраф за медлительность:`, points: -50}
+      fast: {
+        label: `Бонус за скорость:`,
+        points: 50
+      },
+      heart: {
+        label: `Бонус за жизни:`,
+        points: 50
+      },
+      slow: {
+        label: `Штраф за медлительность:`,
+        points: -50
+      }
     }
   },
   maxLives: 3,

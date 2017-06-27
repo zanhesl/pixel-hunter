@@ -1,4 +1,5 @@
 
+import gameModel from '../models/game-model';
 import {renderScreen} from '../data/data';
 import {getLevelResult} from '../data/data';
 import {state as initState} from '../data/data';
@@ -9,7 +10,6 @@ import Application from '../application';
 
 class GamePresenter {
   constructor(userName) {
-    this.data = Application.data;
 
     this.state = Object.assign({}, initState, {
       name: userName,
@@ -18,17 +18,15 @@ class GamePresenter {
 
     this.gameTimer = null;
 
-    this._createGameView();
+    this.level = gameModel.getLevel(this.state.level);
+
+    this.view = new GameView(this.state, this.level);
 
     this._onAsnweredHandler = this._onAsnweredHandler.bind(this);
     this._onChosenHandler = this._onChosenHandler.bind(this);
     this._onBackButtonClickHandler = this._onBackButtonClickHandler.bind(this);
   }
 
-  _createGameView() {
-    this.level = this.data[this.state.level];
-    this.view = new GameView(this.state, this.level);
-  }
 
   _startGame() {
 
@@ -63,11 +61,12 @@ class GamePresenter {
 
   _nextGame() {
 
-    if ((this.state.lives >= 0) && ((this.state.level + 1) < this.data.length)) {
+    if ((this.state.lives >= 0) && ((this.state.level + 1) < gameModel.levelsCount)) {
 
-      this.state.level++;
+      this.level = gameModel.getLevel(++this.state.level);
 
-      this._createGameView();
+      this.view = new GameView(this.state, this.level);
+
       this.init();
 
     } else {
@@ -111,9 +110,11 @@ class GamePresenter {
 
   _onBackButtonClickHandler() {
 
-    clearInterval(this.gameTimer);
+    if (confirm(`Вы действительно хотите закончить игру?`)) {
 
-    Application.showGreeting();
+      clearInterval(this.gameTimer);
+      Application.showGreeting();
+    }
   }
 }
 
