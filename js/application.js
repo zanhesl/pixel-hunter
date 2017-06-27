@@ -16,15 +16,22 @@ const PresenterID = {
 
 
 class Application {
-  constructor() {
+  constructor(viewport) {
 
-    this.showIntro();
+    this.viewport = viewport;
 
     this.routes = {
       [PresenterID.GREETING]: greetingPresenter,
       [PresenterID.RULES]: rulesPresenter,
       [PresenterID.GAME]: gamePresenter,
-      [PresenterID.STATS]: statsPresenter
+      [PresenterID.STATS]: statsPresenter,
+    };
+
+    this.render = {
+      [PresenterID.GREETING]: this._renderFadeAnimationScreen,
+      [PresenterID.RULES]: this._renderScreen,
+      [PresenterID.GAME]: this._renderScreen,
+      [PresenterID.STATS]: this._renderScreen,
     };
 
     window.onhashchange = () => {
@@ -68,15 +75,39 @@ class Application {
   }
 
   _changePresenter(hash) {
-    //this.presenter.destroy();
-    //let previous = this.presenter;
-    this.presenter = this.routes[hash.route](hash.args);
-    this.presenter.init();
+
+    const newPresenter = this.routes[hash.route](hash.args);
+    const renderFunction = this.render[hash.route];
+
+    renderFunction(this.presenter, newPresenter, this.viewport);
+
+    this.presenter = newPresenter;
   }
 
+  _renderScreen(oldPresenter, newPresenter, viewport) {
+    newPresenter.showView(viewport);
+    oldPresenter.destroy();
+  }
+
+  _renderFadeAnimationScreen(oldPresenter, newPresenter, viewport) {
+
+    viewport.classList.add(`main--stack-screens`);
+
+    oldPresenter.element.addEventListener("animationend", () => {
+
+      viewport.classList.remove(`main--animate-screens`);
+      viewport.classList.remove(`main--stack-screens`);
+      oldPresenter.destroy();
+    });
+
+    newPresenter.showView(viewport);
+
+    viewport.classList.add(`main--animate-screens`);
+  }
 
   showIntro() {
-    introPresenter().init();
+    this.presenter = introPresenter();
+    this.presenter.showView(this.viewport);
   }
 
   showGreeting() {
@@ -96,6 +127,8 @@ class Application {
   }
 }
 
-const instance = new Application();
+const viewport = document.getElementById(`main`);
+
+const instance = new Application(viewport);
 
 export default instance;

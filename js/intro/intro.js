@@ -8,11 +8,17 @@ class IntroPresenter {
     this.view = new IntroView();
   }
 
-  init() {
-    renderScreen(this.view);
+  get element() {
+    return this.view.element;
+  }
+
+  destroy() {
+    this.view.remove();
+  }
+
+  showView(viewport) {
+    this.view.show(viewport);
   }
 }
 
-const instance = new IntroPresenter();
-
-export default () => instance;
+export default () => new IntroPresenter();

@@ -9,9 +9,17 @@ class GreetingPresenter {
     this.view = new GreetingView();
   }
 
-  init() {
+  get element() {
+    return this.view.element;
+  }
 
-    renderScreen(this.view, `fadein`);
+  destroy() {
+    this.view.remove();
+  }
+
+  showView(viewport) {
+
+    this.view.show(viewport);
 
     this.view.onContinueButtonClick = () => {
       Application.showRules();
@@ -19,6 +27,4 @@ class GreetingPresenter {
   }
 }
 
-const instance = new GreetingPresenter();
-
-export default () => instance;
+export default () => new GreetingPresenter();;

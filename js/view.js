@@ -1,6 +1,16 @@
 
 export default class AbstractView {
 
+  get element() {
+
+    if (!this._element) {
+      this._element = this.render();
+      this.bind();
+    }
+
+    return this._element;
+  }
+
   get template() {
     throw new Error(`You have to define template for view`);
   }
@@ -15,16 +25,15 @@ export default class AbstractView {
     return screen;
   }
 
-  bind() {
-
+  show(parentNode) {
+    parentNode.appendChild(this.element);
   }
 
-  get element() {
+  remove() {
+    this.element.parentNode.removeChild(this.element);
+  }
 
-    if (!this._element) {
-      this._element = this.render();
-      this.bind();
-    }
-    return this._element;
+  bind() {
+
   }
 }
