@@ -58,42 +58,6 @@ export const typeOptions = {
   }
 };
 
-export function fadeinScreenAnimate(fadeinScreen, fadeoutScreen) {
-  return new Promise((resolve, reject) => {
-
-    const ANIMATION_FPS = 25;
-    const ANIMATION_DURATION = 1;
-    const ANIMATION_TIMEOUT = 1000 / ANIMATION_FPS;
-    const ANIMATION_DELTA = 1 / (ANIMATION_FPS * ANIMATION_DURATION);
-
-    fadeoutScreen.classList.add(`central--absolute`);
-    fadeoutScreen.style.zIndex = `2`;
-    fadeinScreen.style.opacity = `1`;
-
-    fadeinScreen.classList.add(`central--absolute`);
-    fadeinScreen.style.zIndex = `1`;
-    fadeinScreen.style.opacity = `0`;
-
-    function decreaseOpacity(opacity) {
-
-      fadeinScreen.style.opacity = (1 - opacity);
-      fadeoutScreen.style.opacity = opacity;
-
-      opacity = (opacity - ANIMATION_DELTA).toFixed(2);
-
-      if (opacity >= 0.0) {
-        setTimeout(() => {
-          decreaseOpacity(opacity);
-        }, ANIMATION_TIMEOUT);
-      } else {
-        resolve();
-      }
-    }
-
-    decreaseOpacity(1.0);
-  });
-}
-
 export function renderScreen(screen, appearance) {
 
   const viewport = document.getElementById(`main`);
@@ -101,12 +65,15 @@ export function renderScreen(screen, appearance) {
 
   if (curScreen && appearance && appearance === `fadein`) {
 
-    viewport.appendChild(screen.element);
-
-    fadeinScreenAnimate(screen.element, curScreen).then(() => {
+    curScreen.addEventListener("animationend", () => {
+      viewport.classList.remove(`main--animate-screens`);
+      viewport.classList.remove(`main--stack-screens`);
       viewport.removeChild(curScreen);
-      screen.element.classList.remove(`central--absolute`);
     });
+
+    viewport.classList.add(`main--stack-screens`);
+    viewport.appendChild(screen.element);
+    viewport.classList.add(`main--animate-screens`);
 
   } else {
     viewport.innerHTML = ``;
