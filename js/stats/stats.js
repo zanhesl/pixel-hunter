@@ -43,26 +43,24 @@ class StatsPresenter {
   show(viewport) {
 
     this.view.show(viewport);
-/*
+
     this.model.send({stats: this.results, lives: this.lives}, statsAdapter).then(() => {
-      this.model.load(statsAdapter).then((stats) => {
+
+      this.model.load(statsAdapter).then((data) => {
 
         this.view.remove();
-        this._showStatsView(stats);
+
+        this.view = new StatsView(data);
+
+        this.view.show(viewport);
+
+        this.view.onBackButtonClick = () => {
+          Application.showGreeting();
+        };
 
       }).catch(window.console.error);
-    }).catch(window.console.error);*/
-  }
 
-  _showStatsView(stats) {
-
-    this.view = new StatsView(stats);
-
-    this.view.show(viewport);
-
-    this.view.onBackButtonClick = () => {
-      Application.showGreeting();
-    };
+    }).catch(window.console.error);
   }
 }
 

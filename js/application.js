@@ -95,12 +95,17 @@ class Application {
 
     viewport.classList.add(`main--stack-screens`);
 
-    oldPresenter.element.addEventListener("animationend", () => {
+    const onElementAnimationEnd = () => {
 
       viewport.classList.remove(`main--animate-screens`);
       viewport.classList.remove(`main--stack-screens`);
+
+      oldPresenter.element.removeEventListener(`animationend`, onElementAnimationEnd);
+
       oldPresenter.destroy();
-    });
+    };
+
+    oldPresenter.element.addEventListener(`animationend`, onElementAnimationEnd);
 
     newPresenter.show(viewport);
 

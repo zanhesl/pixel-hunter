@@ -1,7 +1,6 @@
 
 import gameModel from '../models/game-model';
 import {Result} from '../data/data';
-import {renderScreen} from '../data/data';
 import {getLevelResult} from '../data/data';
 import {state as initState} from '../data/data';
 import {rules} from '../data/data';
@@ -55,11 +54,10 @@ class GamePresenter {
 
     this.view.onBackButtonClick = () => {
 
-      if (confirm(`Вы действительно хотите закончить игру?`)) {
-
-        clearInterval(this.gameTimer);
-        Application.showGreeting();
-      }
+      // if (confirm(`Вы действительно хотите закончить игру?`)) {
+      clearInterval(this.gameTimer);
+      Application.showGreeting();
+      // }
     };
 
     this._startGame();
@@ -100,7 +98,7 @@ class GamePresenter {
 
   _nextGame() {
 
-    if ((this.state.lives > 0) && ((this.state.level + 1) < gameModel.levelsCount)) {
+    if ((this.state.lives >= 0) && ((this.state.level + 1) < gameModel.levelsCount)) {
 
       this.level = gameModel.getLevel(++this.state.level);
 

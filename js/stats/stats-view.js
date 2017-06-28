@@ -1,22 +1,20 @@
 
 import AbstractView from '../view';
 import {rules} from '../data/data';
-import {countResults} from '../data/data';
 import {getPoints} from '../data/data';
-import {getExtraPointsList} from '../data/data';
+import {getExtraPoints} from '../data/data';
 import {getTotalPoints} from '../data/data';
-import dataResults from '../data/data-results';
 import header from '../header';
 import footer from '../footer';
 
 
 export default class StatsView extends AbstractView {
 
-  constructor(stats) {
+  constructor(data) {
     super();
 
-    this.results = stats[0] || [];
-    this.stats = stats;
+    this.data = data;
+    this.CURRENT_USER_ID = 0;
 
     this._onBackButtonClickHandler = this._onBackButtonClickHandler.bind(this);
   }
@@ -25,20 +23,20 @@ export default class StatsView extends AbstractView {
     return `\
       ${header()}
       <div class="result">
-        <h1>${(this._isGameFailed(this.results)) ? `Fail` : `Победа!`}</h1>
-        ${this.stats.map((results, index) => {
-          return this._templateTableResults(index + 1, results);
+        <h1>${this._isGameFailed(this.CURRENT_USER_ID) ? `Fail` : `Победа!`}</h1>
+        ${this.data.map((item, index) => {
+          return this._templateStatsItem(item, index);
         }).join(``)}
       </div>
       ${footer()}`;
   }
 
-  _isGameFailed(results) {
-    return (rules.maxLives - countResults(results, `wrong`) < 0);
+  _isGameFailed(userID) {
+    return (this.data[userID].lives < 0);
   }
 
   _templateExtra(extra) {
-    return (extra.count === 0) ? `` : `\
+    return (extra.count <= 0) ? `` : `\
       <tr>
         <td></td>
         <td class="result__extra">${extra.label}</td>
@@ -48,12 +46,12 @@ export default class StatsView extends AbstractView {
       </tr>`;
   }
 
-  _templateTableResults(index, results) {
+  _templateStatsItem(data, index) {
 
     let templateTableStat = ``;
     let templateTableExtra = ``;
 
-    if (this._isGameFailed(results)) {
+    if (this._isGameFailed(index)) {
 
       templateTableStat = `\
         <td class="result__total"></td>
@@ -62,22 +60,22 @@ export default class StatsView extends AbstractView {
 
       templateTableStat = `\
         <td class="result__points">×&nbsp;${rules.points.correct}</td>
-        <td class="result__total">${getPoints(results)}</td>`;
+        <td class="result__total">${getPoints(data.stats)}</td>`;
 
       templateTableExtra = `\
-        ${getExtraPointsList(results).map((item) => this._templateExtra(item)).join(``)}
+        ${getExtraPoints(data).map((item) => this._templateExtra(item)).join(``)}
         <tr>
-          <td colspan="5" class="result__total  result__total--final">${getTotalPoints(results)}</td>
+          <td colspan="5" class="result__total  result__total--final">${getTotalPoints(data)}</td>
         </tr>`;
     }
 
     return `\
       <table class="result__table">
         <tr>
-          <td class="result__number">${index}.</td>
+          <td class="result__number">${index + 1}.</td>
           <td colspan="2">
             <ul class="stats">
-              ${results.map((result) => {
+              ${data.stats.map((result) => {
                 return `<li class="stats__result stats__result--${result}"></li>`;
               }).join(``)}
             </ul>

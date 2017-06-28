@@ -1,20 +1,19 @@
 
 import {DefaultAdapter} from '../adapter';
-import {getLivesCount} from '../data/data';
 
 
 export default new class extends DefaultAdapter {
 
   preprocess(data) {
-    return data.sort((left, right) => (right.date - left.date)).map((item) => {
-      return item.stats;
+
+    const dateDesc = (first, second) => (second.date - first.date);
+
+    return data.sort(dateDesc).map((item) => {
+      return {stats: item.stats, lives: parseInt(item.lives, 10)};
     });
   }
 
   toServer(data) {
-    return {
-      stats: data,
-      lives: getLivesCount(data)
-    };
+    return data;
   }
 }();

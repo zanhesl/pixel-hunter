@@ -3,7 +3,7 @@ import Model from '../model.js';
 import gameAdapter from './game-adapter';
 
 
-export default new class extends Model {
+class GameModel extends Model {
   contructor() {
     this._data = [];
   }
@@ -30,6 +30,12 @@ export default new class extends Model {
 
   load(adapter = gameAdapter) {
     return super.load(adapter)
-      .then((data) => this._data = data);
+      .then((data) => {
+        this._data = data;
+      });
   }
 }
+
+const instance = new GameModel();
+
+export default instance;

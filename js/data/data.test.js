@@ -2,7 +2,7 @@
 import assert from 'assert';
 
 import * as data from './data';
-
+import {Result} from './data';
 
 describe(`Game`, () => {
 
@@ -10,10 +10,6 @@ describe(`Game`, () => {
 
     it(`should start from first level`, () => {
       assert.equal(data.state.level, 0);
-    });
-
-    it(`should have 3 live on start`, () => {
-      assert.equal(data.state.lives, 3);
     });
   });
 
@@ -58,35 +54,11 @@ describe(`Game`, () => {
 
       const results = [`wrong`, `unknown`, `slow`, `fast`, `correct`, `wrong`, `slow`, `slow`, `slow`, `fast`, `fast`, `unknown`];
 
-      assert.equal(data.countResults(results, `wrong`), 2);
-      assert.equal(data.countResults(results, `slow`), 4);
-      assert.equal(data.countResults(results, `fast`), 3);
-      assert.equal(data.countResults(results, `correct`), 1);
-      assert.equal(data.countResults(results, `unknown`), 2);
-      assert.equal(data.countResults(results, `random`), 0);
-    });
-
-    it(`should give correct lives left`, () => {
-
-      assert.equal(data.getLivesCount(
-        [`correct`, `slow`, `fast`, `correct`, `correct`, `unknown`, `slow`, `unknown`, `fast`, `unknown`]
-      ), 3);
-
-      assert.equal(data.getLivesCount(
-        [`correct`, `slow`, `fast`, `correct`, `wrong`, `unknown`, `slow`, `unknown`, `fast`, `unknown`]
-      ), 2);
-
-      assert.equal(data.getLivesCount(
-        [`wrong`, `slow`, `fast`, `correct`, `wrong`, `unknown`, `slow`, `unknown`, `fast`, `unknown`]
-      ), 1);
-
-      assert.equal(data.getLivesCount(
-        [`wrong`, `slow`, `fast`, `correct`, `wrong`, `unknown`, `slow`, `wrong`, `fast`, `unknown`]
-      ), 0);
-
-      assert.equal(data.getLivesCount(
-        [`wrong`, `slow`, `wrong`, `correct`, `wrong`, `unknown`, `wrong`, `unknown`, `wrong`, `unknown`]
-      ), 0);
+      assert.equal(data.countValue(results, Result.WRONG), 2);
+      assert.equal(data.countValue(results, Result.SLOW), 4);
+      assert.equal(data.countValue(results, Result.FAST), 3);
+      assert.equal(data.countValue(results, Result.CORRECT), 1);
+      assert.equal(data.countValue(results, Result.UNKNOWN), 2);
     });
   });
 
@@ -95,21 +67,21 @@ describe(`Game`, () => {
     it(`should give correct level's points (without extra points)`, () => {
 
       const tests = [{
-        results: [`wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `unknown`, `unknown`, `unknown`, `unknown`, `unknown`],
+        stats: [`wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `unknown`, `unknown`, `unknown`, `unknown`, `unknown`],
         points: 0
       }, {
-        results: [`correct`, `wrong`, `fast`, `wrong`, `wrong`, `correct`, `wrong`, `correct`, `correct`, `wrong`],
+        stats: [`correct`, `wrong`, `fast`, `wrong`, `wrong`, `correct`, `wrong`, `correct`, `correct`, `wrong`],
         points: 500
       }, {
-        results: [`correct`, `correct`, `fast`, `slow`, `correct`, `unknown`, `slow`, `wrong`, `wrong`, `fast`],
+        stats: [`correct`, `correct`, `fast`, `slow`, `correct`, `unknown`, `slow`, `wrong`, `wrong`, `fast`],
         points: 700
       }, {
-        results: [`correct`, `correct`, `fast`, `slow`, `correct`, `correct`, `slow`, `correct`, `correct`, `fast`],
+        stats: [`correct`, `correct`, `fast`, `slow`, `correct`, `correct`, `slow`, `correct`, `correct`, `fast`],
         points: 1000
       }];
 
       function runTest(test) {
-        const points = data.getPoints(test.results);
+        const points = data.getPoints(test.stats);
 
         assert.equal(points, test.points);
       }
@@ -120,24 +92,24 @@ describe(`Game`, () => {
     it(`should give correct total level's points (with extra points)`, () => {
 
       const tests = [{
-        results: [`wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`],
+        data: {stats: [`wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`], lives: 0},
         points: 0
       }, {
-        results: [`correct`, `wrong`, `fast`, `wrong`, `slow`, `correct`, `slow`, `correct`, `correct`, `wrong`],
+        data: {stats: [`correct`, `wrong`, `fast`, `wrong`, `slow`, `correct`, `slow`, `correct`, `correct`, `wrong`], lives: 0},
         points: 650
       }, {
-        results: [`correct`, `correct`, `fast`, `slow`, `correct`, `correct`, `slow`, `wrong`, `wrong`, `fast`],
+        data: {stats: [`correct`, `correct`, `fast`, `slow`, `correct`, `correct`, `slow`, `wrong`, `wrong`, `fast`], lives: 1},
         points: 850
       }, {
-        results: [`correct`, `correct`, `fast`, `slow`, `correct`, `slow`, `slow`, `correct`, `correct`, `fast`],
+        data: {stats: [`correct`, `correct`, `fast`, `slow`, `correct`, `slow`, `slow`, `correct`, `correct`, `fast`], lives: 3},
         points: 1100
       }, {
-        results: [`correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`],
+        data: {stats: [`correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`], lives: 3},
         points: 1150
       }];
 
       function runTest(test) {
-        const points = data.getTotalPoints(test.results);
+        const points = data.getTotalPoints(test.data);
 
         assert.equal(points, test.points);
       }
@@ -148,28 +120,29 @@ describe(`Game`, () => {
     it(`should give correct fast answer extra points`, () => {
 
       const tests = [{
-        results: [`correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`],
+        data: {stats: [`correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`], lives: 3},
         count: 0,
         total: 0
       }, {
-        results: [`correct`, `correct`, `fast`, `slow`, `correct`, `fast`, `slow`, `correct`, `correct`, `fast`],
+        data: {stats: [`correct`, `correct`, `fast`, `slow`, `correct`, `fast`, `slow`, `correct`, `correct`, `fast`], lives: 3},
         count: 3,
         total: 150
       }, {
-        results: [`fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`],
+        data: {stats: [`fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`, `fast`], lives: 3},
         count: 10,
         total: 500
       }, {
-        results: [`correct`, `correct`, `fast`, `slow`, `correct`, `slow`, `slow`, `correct`, `correct`, `fast`],
+        data: {stats: [`correct`, `correct`, `fast`, `slow`, `correct`, `slow`, `slow`, `correct`, `correct`, `fast`], lives: 3},
         count: 2,
         total: 100
       }];
 
       function runTest(test) {
-        const pointsList = data.getExtraPointsList(test.results);
+        const EXTRA_FAST_INDEX = 0;
+        const pointsList = data.getExtraPoints(test.data);
 
-        assert.equal(pointsList[0].count, test.count);
-        assert.equal(pointsList[0].total, test.total);
+        assert.equal(pointsList[EXTRA_FAST_INDEX].count, test.count);
+        assert.equal(pointsList[EXTRA_FAST_INDEX].total, test.total);
       }
 
       tests.forEach(runTest);
@@ -178,28 +151,29 @@ describe(`Game`, () => {
     it(`should give correct lives extra points`, () => {
 
       const tests = [{
-        results: [`correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`],
+        data: {stats: [`correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`], lives: 3},
         count: 3,
         total: 150
       }, {
-        results: [`correct`, `wrong`, `fast`, `slow`, `correct`, `fast`, `slow`, `wrong`, `correct`, `fast`],
+        data: {stats: [`correct`, `wrong`, `fast`, `slow`, `correct`, `fast`, `slow`, `wrong`, `correct`, `fast`], lives: 1},
         count: 1,
         total: 50
       }, {
-        results: [`wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`],
+        data: {stats: [`wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`, `wrong`], lives: 0},
         count: 0,
         total: 0
       }, {
-        results: [`correct`, `correct`, `fast`, `slow`, `correct`, `slow`, `slow`, `correct`, `correct`, `fast`],
+        data: {stats: [`correct`, `correct`, `fast`, `slow`, `correct`, `slow`, `slow`, `correct`, `correct`, `fast`], lives: 3},
         count: 3,
         total: 150
       }];
 
       function runTest(test) {
-        const pointsList = data.getExtraPointsList(test.results);
+        const EXTRA_LIVES_INDEX = 1;
+        const pointsList = data.getExtraPoints(test.data);
 
-        assert.equal(pointsList[1].count, test.count);
-        assert.equal(pointsList[1].total, test.total);
+        assert.equal(pointsList[EXTRA_LIVES_INDEX].count, test.count);
+        assert.equal(pointsList[EXTRA_LIVES_INDEX].total, test.total);
       }
 
       tests.forEach(runTest);
@@ -208,28 +182,29 @@ describe(`Game`, () => {
     it(`should give correct slow answer extra points`, () => {
 
       const tests = [{
-        results: [`correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`],
+        data: {stats: [`correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`, `correct`], lives: 3},
         count: 0,
         total: 0
       }, {
-        results: [`correct`, `correct`, `fast`, `slow`, `correct`, `fast`, `slow`, `correct`, `correct`, `fast`],
+        data: {stats: [`correct`, `correct`, `fast`, `slow`, `correct`, `fast`, `slow`, `correct`, `correct`, `fast`], lives: 3},
         count: 2,
         total: -100
       }, {
-        results: [`slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`],
+        data: {stats: [`slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`, `slow`], lives: 3},
         count: 10,
         total: -500
       }, {
-        results: [`correct`, `correct`, `fast`, `slow`, `correct`, `slow`, `slow`, `correct`, `correct`, `fast`],
+        data: {stats: [`correct`, `correct`, `fast`, `slow`, `correct`, `slow`, `slow`, `correct`, `correct`, `fast`], lives: 3},
         count: 3,
         total: -150
       }];
 
       function runTest(test) {
-        const pointsList = data.getExtraPointsList(test.results);
+        const EXTRA_SLOW_INDEX = 2;
+        const pointsList = data.getExtraPoints(test.data);
 
-        assert.equal(pointsList[2].count, test.count);
-        assert.equal(pointsList[2].total, test.total);
+        assert.equal(pointsList[EXTRA_SLOW_INDEX].count, test.count);
+        assert.equal(pointsList[EXTRA_SLOW_INDEX].total, test.total);
       }
 
       tests.forEach(runTest);
