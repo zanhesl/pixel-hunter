@@ -1,5 +1,4 @@
 
-import {renderScreen} from '../data/data';
 import GreetingView from './greeting-view';
 import Application from '../application';
 
@@ -14,10 +13,11 @@ class GreetingPresenter {
   }
 
   destroy() {
+    this.view.onContinueButtonClick = null;
     this.view.remove();
   }
 
-  showView(viewport) {
+  show(viewport) {
 
     this.view.show(viewport);
 

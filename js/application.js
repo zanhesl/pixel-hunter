@@ -16,9 +16,11 @@ const PresenterID = {
 
 
 class Application {
-  constructor(viewport) {
+  constructor() {
 
-    this.viewport = viewport;
+    this.viewport = document.getElementById(`main`);
+
+    this.presenter = introPresenter();
 
     this.routes = {
       [PresenterID.GREETING]: greetingPresenter,
@@ -85,7 +87,7 @@ class Application {
   }
 
   _renderScreen(oldPresenter, newPresenter, viewport) {
-    newPresenter.showView(viewport);
+    newPresenter.show(viewport);
     oldPresenter.destroy();
   }
 
@@ -100,14 +102,13 @@ class Application {
       oldPresenter.destroy();
     });
 
-    newPresenter.showView(viewport);
+    newPresenter.show(viewport);
 
     viewport.classList.add(`main--animate-screens`);
   }
 
-  showIntro() {
-    this.presenter = introPresenter();
-    this.presenter.showView(this.viewport);
+  init() {
+    this.presenter.show(this.viewport);
   }
 
   showGreeting() {
@@ -127,8 +128,6 @@ class Application {
   }
 }
 
-const viewport = document.getElementById(`main`);
-
-const instance = new Application(viewport);
+const instance = new Application();
 
 export default instance;

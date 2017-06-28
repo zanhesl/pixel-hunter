@@ -23,7 +23,7 @@ export function loadImage(src) {
     let timeout = null;
 
     const img = new Image();
-    const TIMEOUT_DELAY = 8000;
+    const LOAD_TIMEOUT = 10000;
 
     img.onload = () => {
       clearTimeout(timeout);
@@ -41,7 +41,7 @@ export function loadImage(src) {
       img.src = ``;
       reject(new Error(`Loading timeout of image [${src}] is expired`));
 
-    }, TIMEOUT_DELAY);
+    }, LOAD_TIMEOUT);
 
     img.src = src;
   });

@@ -1,5 +1,4 @@
 
-import {renderScreen} from '../data/data';
 import IntroView from './intro-view';
 
 
@@ -16,7 +15,7 @@ class IntroPresenter {
     this.view.remove();
   }
 
-  showView(viewport) {
+  show(viewport) {
     this.view.show(viewport);
   }
 }

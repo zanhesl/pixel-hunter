@@ -1,5 +1,4 @@
 
-import {renderScreen} from '../data/data';
 import IntroView from '../intro/intro-view';
 import StatsView from './stats-view';
 import Application from '../application';
@@ -8,8 +7,9 @@ import statsAdapter from '../models/stats-adapter';
 
 
 class StatsPresenter {
-  constructor(userName, results) {
+  constructor(userName, lives, results) {
 
+    this.lives = lives;
     this.results = results;
 
     this.view = new IntroView();
@@ -31,34 +31,41 @@ class StatsPresenter {
     }(userName);
   }
 
+  get element() {
+    return this.view.element;
+  }
 
-  init() {
+  destroy() {
+    this.view.onBackButtonClick = null;
+    this.view.remove();
+  }
 
-    renderScreen(this.view);
+  show(viewport) {
 
-    this.model.send(this.results, statsAdapter).then(() => {
-
-      console.log('Start to load stats!');
-
+    this.view.show(viewport);
+/*
+    this.model.send({stats: this.results, lives: this.lives}, statsAdapter).then(() => {
       this.model.load(statsAdapter).then((stats) => {
 
-        console.log('Finish load!');
-
-        this.view = new StatsView(stats);
-
-        renderScreen(this.view);
-
-        this.view.onBackButtonClick = () => {
-          Application.showGreeting();
-        };
+        this.view.remove();
+        this._showStatsView(stats);
 
       }).catch(window.console.error);
+    }).catch(window.console.error);*/
+  }
 
-    }).catch(window.console.error);
+  _showStatsView(stats) {
+
+    this.view = new StatsView(stats);
+
+    this.view.show(viewport);
+
+    this.view.onBackButtonClick = () => {
+      Application.showGreeting();
+    };
   }
 }
 
-export default (args = {name: `Unknown`, results: ``}) => {
-
-  return new StatsPresenter(args.name, args.results.split(`,`));
+export default (args = {name: `Unknown`, lives: 0, results: ``}) => {
+  return new StatsPresenter(args.name, args.lives, args.results.split(`,`));
 };

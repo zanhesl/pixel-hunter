@@ -1,5 +1,5 @@
 
-const Result = Object.freeze({
+export const Result = Object.freeze({
   CORRECT: `correct`,
   WRONG: `wrong`,
   FAST: `fast`,
@@ -38,7 +38,7 @@ export const rules = {
 export const state = Object.freeze({
   level: 0,
   levels: [],
-  lives: rules.maxLives,
+  lives: rules.maxLives + 1,
   name: `Unknown`,
   results: Object.freeze(new Array(rules.levelsCount).fill(Result.UNKNOWN))
 });

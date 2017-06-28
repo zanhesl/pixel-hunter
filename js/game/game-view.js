@@ -19,6 +19,8 @@ export default class GameView extends AbstractView {
     this.hasAnswers = data.hasAnswers;
 
     this._onAnswerChangeHandler = this._onAnswerChangeHandler.bind(this);
+    this._onOptionClickHandler = this._onOptionClickHandler.bind(this);
+    this._onBackButtonClickHandler = this._onBackButtonClickHandler.bind(this);
   }
 
 
@@ -44,7 +46,7 @@ export default class GameView extends AbstractView {
   }
 
   get gameTime() {
-    return rules.gameTime - parseInt(this.gameTimer.textContent, 10);
+    return parseInt(this.gameTimer.textContent, 10);
   }
 
   set gameTime(time) {
@@ -73,7 +75,6 @@ export default class GameView extends AbstractView {
 
   _setOptionImage(option, optionIndex) {
 
-    const imgTag = option.querySelector(`img`);
     const image = this.answers[optionIndex].image;
     const frame = {width: image.width, height: image.height};
 
@@ -86,16 +87,23 @@ export default class GameView extends AbstractView {
     image.tag.height = actualSize.height;
     image.tag.alt = `Option ${optionIndex + 1}`;
 
-    imgTag.parentNode.replaceChild(image.tag, imgTag);
+    const tag = option.querySelector(`img`);
+    tag.parentNode.replaceChild(image.tag, tag);
   }
 
-  _onAnswerChangeHandler(evt) {
+  _addAnswerChangeHandlers() {
+    for (const question of this.questions) {
+      for (const element of question) {
+        element.addEventListener(`change`, this._onAnswerChangeHandler);
+      }
+    }
+  }
 
-    const name = evt.currentTarget.name;
-    const answers = this.gameContent.elements[name];
-
-    for (const answer of answers) {
-      answer.disabled = true;
+  _removeAnswerChangeHandlers() {
+    for (const question of this.questions) {
+      for (const element of question) {
+        element.removeEventListener(`change`, this._onAnswerChangeHandler);
+      }
     }
   }
 
@@ -119,49 +127,79 @@ export default class GameView extends AbstractView {
       </div>`;
   }
 
+  _onAnswerChangeHandler(evt) {
+
+    const name = evt.currentTarget.name;
+    const answers = this.gameContent.elements[name];
+
+    for (const answer of answers) {
+      answer.disabled = true;
+    }
+  }
+
+  _onOptionClickHandler(evt) {
+
+    if (this.hasAnswers && this._isAnswered()) {
+      this.onAnswered(this.gameTime, this._getAnswers());
+    }
+
+    if (!this.hasAnswers) {
+
+      const index = Array.from(this.gameOptions).indexOf(evt.currentTarget);
+
+      this.onChosen(this.gameTime, this._getChoice(index));
+    }
+  }
+
+  _onBackButtonClickHandler(evt) {
+    evt.preventDefault();
+    this.onBackButtonClick();
+  }
+
+  remove() {
+
+    if (this.hasAnswers) {
+      this._removeAnswerChangeHandlers();
+    }
+
+    for (const option of this.gameOptions) {
+      option.removeEventListener(`click`, this._onOptionClickHandler);
+    }
+
+    this.backButton.removeEventListener(`click`, this._onBackButtonClickHandler);
+
+    super.remove();
+  }
 
   bind() {
 
+    this.backButton = this.element.querySelector(`.header__back`);
     this.gameTimer = this.element.querySelector(`.game__timer`);
     this.gameContent = this.element.querySelector(`.game__content`);
+    this.gameOptions = this.gameContent.querySelectorAll(`.game__option`);
 
     this.questions = this.answers.map((answer, index) => {
       return Array.from(this.gameContent.elements[`question${index + 1}`] || []);
     });
 
 
-    const gameOptions = this.gameContent.querySelectorAll(`.game__option`);
+    let optionIndex = 0;
 
-    Array.from(gameOptions).forEach((option, index) => {
+    for (const option of this.gameOptions) {
+
+      const index = optionIndex++;
 
       this._setOptionImage(option, index);
 
       if (this.hasAnswers) {
-        for (const it of this.questions[index]) {
-          it.addEventListener(`change`, this._onAnswerChangeHandler);
-        }
+        this._addAnswerChangeHandlers();
       }
 
-      option.addEventListener(`click`, (evt) => {
+      option.addEventListener(`click`, this._onOptionClickHandler);
+    }
 
-        if (this.hasAnswers && this._isAnswered()) {
-          this.onAnswered(this.gameTime, this._getAnswers());
-        }
-
-        if (!this.hasAnswers) {
-          this.onChosen(this.gameTime, this._getChoice(index));
-        }
-      }, true);
-    });
-
-    const backButton = this.element.querySelector(`.header__back`);
-
-    backButton.addEventListener(`click`, (evt) => {
-      evt.preventDefault();
-      this.onBackButtonClick();
-    });
+    this.backButton.addEventListener(`click`, this._onBackButtonClickHandler);
   }
-
 
   onAnswered(time, answers) {
 

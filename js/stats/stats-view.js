@@ -17,20 +17,34 @@ export default class StatsView extends AbstractView {
 
     this.results = stats[0] || [];
     this.stats = stats;
+
+    this._onBackButtonClickHandler = this._onBackButtonClickHandler.bind(this);
+  }
+
+  get template() {
+    return `\
+      ${header()}
+      <div class="result">
+        <h1>${(this._isGameFailed(this.results)) ? `Fail` : `Победа!`}</h1>
+        ${this.stats.map((results, index) => {
+          return this._templateTableResults(index + 1, results);
+        }).join(``)}
+      </div>
+      ${footer()}`;
   }
 
   _isGameFailed(results) {
     return (rules.maxLives - countResults(results, `wrong`) < 0);
   }
 
-  _templateBonus(bonus) {
-    return (bonus.count === 0) ? `` : `\
+  _templateExtra(extra) {
+    return (extra.count === 0) ? `` : `\
       <tr>
         <td></td>
-        <td class="result__extra">${bonus.label}</td>
-        <td class="result__extra">${bonus.count}&nbsp;<span class="stats__result stats__result--${bonus.key}"></span></td>
-        <td class="result__points">×&nbsp;${bonus.points}</td>
-        <td class="result__total">${bonus.total}</td>
+        <td class="result__extra">${extra.label}</td>
+        <td class="result__extra">${extra.count}&nbsp;<span class="stats__result stats__result--${extra.key}"></span></td>
+        <td class="result__points">×&nbsp;${extra.points}</td>
+        <td class="result__total">${extra.total}</td>
       </tr>`;
   }
 
@@ -51,7 +65,7 @@ export default class StatsView extends AbstractView {
         <td class="result__total">${getPoints(results)}</td>`;
 
       templateTableExtra = `\
-        ${getExtraPointsList(results).map((item) => this._templateBonus(item)).join(``)}
+        ${getExtraPointsList(results).map((item) => this._templateExtra(item)).join(``)}
         <tr>
           <td colspan="5" class="result__total  result__total--final">${getTotalPoints(results)}</td>
         </tr>`;
@@ -74,27 +88,23 @@ export default class StatsView extends AbstractView {
       </table>`;
   }
 
+  _onBackButtonClickHandler(evt) {
+    evt.preventDefault();
+    this.onBackButtonClick();
+  }
 
-  get template() {
-    return `\
-      ${header()}
-      <div class="result">
-        <h1>${(this._isGameFailed(this.results)) ? `Fail` : `Победа!`}</h1>
-        ${this.stats.map((results, index) => {
-          return this._templateTableResults(index + 1, results);
-        }).join(``)}
-      </div>
-      ${footer()}`;
+  remove() {
+
+    this.backButton.removeEventListener(`click`, this._onBackButtonClickHandler);
+
+    super.remove();
   }
 
   bind() {
 
-    const backButton = this.element.querySelector(`.header__back`);
+    this.backButton = this.element.querySelector(`.header__back`);
 
-    backButton.addEventListener(`click`, (evt) => {
-      evt.preventDefault();
-      this.onBackButtonClick();
-    });
+    this.backButton.addEventListener(`click`, this._onBackButtonClickHandler);
   }
 
   onBackButtonClick() {

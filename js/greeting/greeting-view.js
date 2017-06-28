@@ -7,7 +7,7 @@ export default class GreetingView extends AbstractView {
   constructor() {
     super();
 
-    this._onContinueClickHandler = this._onContinueClickHandler.bind(this);
+    this._onContinueButtonClickHandler = this._onContinueButtonClickHandler.bind(this);
   }
 
   get template() {
@@ -28,21 +28,20 @@ export default class GreetingView extends AbstractView {
       ${footer()}`;
   }
 
-  _onContinueClickHandler(evt) {
+  _onContinueButtonClickHandler(evt) {
     evt.preventDefault();
     this.onContinueButtonClick();
   }
 
   remove() {
-    this.onContinueButtonClick = null;
-    this._greetingContinue.removeEventListener(`click`, this._onContinueClickHandler);
+    this._greetingContinue.removeEventListener(`click`, this._onContinueButtonClickHandler);
     super.remove();
   }
 
   bind() {
     this._greetingContinue = this.element.querySelector(`.greeting__continue`);
 
-    this._greetingContinue.addEventListener(`click`, this._onContinueClickHandler);
+    this._greetingContinue.addEventListener(`click`, this._onContinueButtonClickHandler);
   }
 
   onContinueButtonClick() {
