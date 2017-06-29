@@ -4,19 +4,19 @@ import IntroView from './intro-view';
 
 class IntroPresenter {
   constructor() {
-    this.view = new IntroView();
+    this._view = new IntroView();
   }
 
   get element() {
-    return this.view.element;
+    return this._view.element;
   }
 
   destroy() {
-    this.view.remove();
+    this._view.remove();
   }
 
   show(viewport) {
-    this.view.show(viewport);
+    this._view.show(viewport);
   }
 }
 

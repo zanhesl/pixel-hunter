@@ -13,7 +13,7 @@ export default class StatsView extends AbstractView {
   constructor(data) {
     super();
 
-    this.data = data;
+    this._data = data;
     this.CURRENT_USER_ID = 0;
 
     this._onBackButtonClickHandler = this._onBackButtonClickHandler.bind(this);
@@ -24,7 +24,7 @@ export default class StatsView extends AbstractView {
       ${header()}
       <div class="result">
         <h1>${this._isGameFailed(this.CURRENT_USER_ID) ? `Fail` : `Победа!`}</h1>
-        ${this.data.map((item, index) => {
+        ${this._data.map((item, index) => {
           return this._templateStatsItem(item, index);
         }).join(``)}
       </div>
@@ -32,7 +32,7 @@ export default class StatsView extends AbstractView {
   }
 
   _isGameFailed(userID) {
-    return (this.data[userID].lives === 0);
+    return (this._data[userID].lives === 0);
   }
 
   _templateExtra(extra) {
@@ -93,16 +93,16 @@ export default class StatsView extends AbstractView {
 
   remove() {
 
-    this.backButton.removeEventListener(`click`, this._onBackButtonClickHandler);
+    this._backButton.removeEventListener(`click`, this._onBackButtonClickHandler);
 
     super.remove();
   }
 
   bind() {
 
-    this.backButton = this.element.querySelector(`.header__back`);
+    this._backButton = this.element.querySelector(`.header__back`);
 
-    this.backButton.addEventListener(`click`, this._onBackButtonClickHandler);
+    this._backButton.addEventListener(`click`, this._onBackButtonClickHandler);
   }
 
   onBackButtonClick() {

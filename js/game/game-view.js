@@ -11,12 +11,12 @@ export default class GameView extends AbstractView {
   constructor(state, data) {
     super();
 
-    this.state = state;
+    this._state = state;
 
-    this.question = data.question;
-    this.answers = data.answers;
-    this.formClass = data.formClass;
-    this.hasAnswers = data.hasAnswers;
+    this._question = data.question;
+    this._answers = data.answers;
+    this._formClass = data.formClass;
+    this._hasAnswers = data.hasAnswers;
 
     this._onAnswerChangeHandler = this._onAnswerChangeHandler.bind(this);
     this._onOptionClickHandler = this._onOptionClickHandler.bind(this);
@@ -26,17 +26,17 @@ export default class GameView extends AbstractView {
 
   get template() {
     return `\
-      ${header(this.state)}
+      ${header(this._state)}
       <div class="game">
-        <p class="game__task">${this.question}</p>
-        <form class="${this.formClass}">
-          ${this.answers.map((answer, index) => {
+        <p class="game__task">${this._question}</p>
+        <form class="${this._formClass}">
+          ${this._answers.map((answer, index) => {
             return this._templateOption(index);
           }).join(``)}
         </form>
         <div class="stats">
           <ul class="stats">
-            ${this.state.results.map((result) => {
+            ${this._state.results.map((result) => {
               return `<li class="stats__result stats__result--${result}"></li>`;
             }).join(``)}
           </ul>
@@ -46,36 +46,36 @@ export default class GameView extends AbstractView {
   }
 
   get gameTime() {
-    return parseInt(this.gameTimer.textContent, 10);
+    return parseInt(this._gameTimer.textContent, 10);
   }
 
   set gameTime(time) {
 
     const isWarningTime = (time <= rules.warningTime);
 
-    this.gameTimer.textContent = time;
-    this.gameTimer.classList.toggle(`game__timer--blink`, isWarningTime);
+    this._gameTimer.textContent = time;
+    this._gameTimer.classList.toggle(`game__timer--blink`, isWarningTime);
   }
 
   _isAnswered() {
-    return this.questions.every((question) => {
+    return this._questions.every((question) => {
       return question.some((item) => item.checked);
     });
   }
 
   _getAnswers() {
-    return this.questions.map((question) => {
+    return this._questions.map((question) => {
       return question.find((item) => item.checked).value;
     });
   }
 
   _getChoice(optionIndex) {
-    return this.answers[optionIndex].type;
+    return this._answers[optionIndex].type;
   }
 
   _setOptionImage(option, optionIndex) {
 
-    const image = this.answers[optionIndex].image;
+    const image = this._answers[optionIndex].image;
     const frame = {width: image.width, height: image.height};
 
     const actualSize = resizeImage(frame, {
@@ -92,7 +92,7 @@ export default class GameView extends AbstractView {
   }
 
   _addAnswerChangeHandlers() {
-    for (const question of this.questions) {
+    for (const question of this._questions) {
       for (const element of question) {
         element.addEventListener(`change`, this._onAnswerChangeHandler);
       }
@@ -100,7 +100,7 @@ export default class GameView extends AbstractView {
   }
 
   _removeAnswerChangeHandlers() {
-    for (const question of this.questions) {
+    for (const question of this._questions) {
       for (const element of question) {
         element.removeEventListener(`change`, this._onAnswerChangeHandler);
       }
@@ -123,14 +123,14 @@ export default class GameView extends AbstractView {
     return `\
       <div class="game__option">
         <img>
-        ${(this.hasAnswers) ? this._templateAnswer(index + 1) : ``}
+        ${(this._hasAnswers) ? this._templateAnswer(index + 1) : ``}
       </div>`;
   }
 
   _onAnswerChangeHandler(evt) {
 
     const name = evt.currentTarget.name;
-    const answers = this.gameContent.elements[name];
+    const answers = this._gameContent.elements[name];
 
     for (const answer of answers) {
       answer.disabled = true;
@@ -149,9 +149,9 @@ export default class GameView extends AbstractView {
       return;
     }
 
-    if (!this.hasAnswers) {
+    if (!this._hasAnswers) {
 
-      const index = Array.from(this.gameOptions).indexOf(evt.currentTarget);
+      const index = Array.from(this._gameOptions).indexOf(evt.currentTarget);
 
       this.onChosen(this.gameTime, this._getChoice(index));
     }
@@ -164,47 +164,47 @@ export default class GameView extends AbstractView {
 
   remove() {
 
-    if (this.hasAnswers) {
+    if (this._hasAnswers) {
       this._removeAnswerChangeHandlers();
     }
 
-    for (const option of this.gameOptions) {
+    for (const option of this._gameOptions) {
       option.removeEventListener(`mouseup`, this._onOptionClickHandler);
     }
 
-    this.backButton.removeEventListener(`click`, this._onBackButtonClickHandler);
+    this._backButton.removeEventListener(`click`, this._onBackButtonClickHandler);
 
     super.remove();
   }
 
   bind() {
 
-    this.backButton = this.element.querySelector(`.header__back`);
-    this.gameTimer = this.element.querySelector(`.game__timer`);
-    this.gameContent = this.element.querySelector(`.game__content`);
-    this.gameOptions = this.gameContent.querySelectorAll(`.game__option`);
+    this._backButton = this.element.querySelector(`.header__back`);
+    this._gameTimer = this.element.querySelector(`.game__timer`);
+    this._gameContent = this.element.querySelector(`.game__content`);
+    this._gameOptions = this._gameContent.querySelectorAll(`.game__option`);
 
-    this.questions = this.answers.map((answer, index) => {
-      return Array.from(this.gameContent.elements[`question${index + 1}`] || []);
+    this._questions = this._answers.map((answer, index) => {
+      return Array.from(this._gameContent.elements[`question${index + 1}`] || []);
     });
 
 
     let optionIndex = 0;
 
-    for (const option of this.gameOptions) {
+    for (const option of this._gameOptions) {
 
       const index = optionIndex++;
 
       this._setOptionImage(option, index);
 
-      if (this.hasAnswers) {
+      if (this._hasAnswers) {
         this._addAnswerChangeHandlers();
       }
 
       option.addEventListener(`mouseup`, this._onOptionClickHandler, true);
     }
 
-    this.backButton.addEventListener(`click`, this._onBackButtonClickHandler);
+    this._backButton.addEventListener(`click`, this._onBackButtonClickHandler);
   }
 
   onAnswered(time, answers) {
