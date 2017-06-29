@@ -1,6 +1,5 @@
 
-import Model from './model';
-import dataAdapter from './data/data-adapter';
+import gameModel from './models/game-model';
 import introPresenter from './intro/intro';
 import greetingPresenter from './greeting/greeting';
 import rulesPresenter from './rules/rules';
@@ -19,20 +18,29 @@ const PresenterID = {
 class Application {
   constructor() {
 
-    this.showIntro();
+    this.viewport = document.getElementById(`main`);
 
-    this.model = new class extends Model {
-      get urlRead() {
-        return `https://intensive-ecmascript-server-btfgudlkpi.now.sh/pixel-hunter/questions`;
-      }
+    this.presenter = introPresenter();
 
-      get urlWrite() {
-        return ``;
-      }
-    }();
+    this.routes = {
+      [PresenterID.GREETING]: greetingPresenter,
+      [PresenterID.RULES]: rulesPresenter,
+      [PresenterID.GAME]: gamePresenter,
+      [PresenterID.STATS]: statsPresenter,
+    };
 
-    this.model.load(dataAdapter)
-      .then((data) => this._setup(data))
+    this.render = {
+      [PresenterID.GREETING]: this._renderFadeAnimationScreen,
+      [PresenterID.RULES]: this._renderScreen,
+      [PresenterID.GAME]: this._renderScreen,
+      [PresenterID.STATS]: this._renderScreen,
+    };
+
+    window.onhashchange = () => {
+      this._changePresenter(this._parseLocationHash());
+    };
+
+    gameModel.load()
       .then(() => this._changePresenter(this._parseLocationHash()))
       .catch(window.console.error);
   }
@@ -69,27 +77,43 @@ class Application {
   }
 
   _changePresenter(hash) {
-    this.routes[hash.route](hash.args).init();
+
+    const newPresenter = this.routes[hash.route](hash.args);
+    const renderFunction = this.render[hash.route];
+
+    renderFunction(this.presenter, newPresenter, this.viewport);
+
+    this.presenter = newPresenter;
   }
 
-  _setup(data) {
-
-    this.data = data;
-
-    this.routes = {
-      [PresenterID.GREETING]: greetingPresenter,
-      [PresenterID.RULES]: rulesPresenter,
-      [PresenterID.GAME]: gamePresenter,
-      [PresenterID.STATS]: statsPresenter
-    };
-
-    window.onhashchange = () => {
-      this._changePresenter(this._parseLocationHash());
-    };
+  _renderScreen(oldPresenter, newPresenter, viewport) {
+    newPresenter.show(viewport);
+    oldPresenter.destroy();
   }
 
-  showIntro() {
-    introPresenter().init();
+  _renderFadeAnimationScreen(oldPresenter, newPresenter, viewport) {
+
+    viewport.classList.add(`main--stack-screens`);
+
+    const onElementAnimationEnd = () => {
+
+      viewport.classList.remove(`main--animate-screens`);
+      viewport.classList.remove(`main--stack-screens`);
+
+      oldPresenter.element.removeEventListener(`animationend`, onElementAnimationEnd);
+
+      oldPresenter.destroy();
+    };
+
+    oldPresenter.element.addEventListener(`animationend`, onElementAnimationEnd);
+
+    newPresenter.show(viewport);
+
+    viewport.classList.add(`main--animate-screens`);
+  }
+
+  init() {
+    this.presenter.show(this.viewport);
   }
 
   showGreeting() {

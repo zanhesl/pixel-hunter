@@ -6,9 +6,12 @@ import footer from '../footer';
 
 
 export default class RulesView extends AbstractView {
+  constructor() {
+    super();
 
-  _getUserName(input) {
-    return input.value.trim().replace(/[#//]/g, ``);
+    this._onInputChangeHandler = this._onInputChangeHandler.bind(this);
+    this._onContinueButtonClickHandler = this._onContinueButtonClickHandler.bind(this);
+    this._onBackButtonClickHandler = this._onBackButtonClickHandler.bind(this);
   }
 
   get template() {
@@ -33,35 +36,46 @@ export default class RulesView extends AbstractView {
       ${footer()}`;
   }
 
-  bind() {
-
-    const backButton = this.element.querySelector(`.header__back`);
-    const rulesForm = this.element.querySelector(`.rules__form`);
-    const rulesInput = rulesForm.querySelector(`.rules__input`);
-
-    this.rulesButton = rulesForm.querySelector(`.rules__button`);
-
-    rulesForm.addEventListener(`submit`, (evt) => {
-      evt.preventDefault();
-
-      rulesInput.disabled = true;
-      this.rulesButton.disabled = true;
-
-      this.onContinueButtonClick(this._getUserName(rulesInput));
-    });
-
-    rulesInput.addEventListener(`input`, () => {
-      this.rulesButton.disabled = (rulesInput.value.length === 0);
-    });
-
-    backButton.addEventListener(`click`, (evt) => {
-      evt.preventDefault();
-      this.onBackButtonClick();
-    });
+  _getUserName() {
+    return this.rulesInput.value.replace(/[#//]/g, ``).trim();
   }
 
-  setProgress(progress) {
-    this.rulesButton.textContent = `${progress}%`;
+  _onInputChangeHandler() {
+    this.rulesButton.disabled = (this._getUserName().length === 0);
+  }
+
+  _onContinueButtonClickHandler(evt) {
+    evt.preventDefault();
+
+    this.rulesInput.disabled = true;
+    this.rulesButton.disabled = true;
+
+    this.onContinueButtonClick(this._getUserName());
+  }
+
+  _onBackButtonClickHandler(evt) {
+    evt.preventDefault();
+    this.onBackButtonClick();
+  }
+
+  remove() {
+    this.rulesInput.removeEventListener(`input`, this._onInputChangeHandler);
+    this.rulesForm.removeEventListener(`submit`, this._onContinueButtonClickHandler);
+    this.backButton.removeEventListener(`click`, this._onBackButtonClickHandler);
+    super.remove();
+  }
+
+  bind() {
+
+    this.backButton = this.element.querySelector(`.header__back`);
+    this.rulesForm = this.element.querySelector(`.rules__form`);
+
+    this.rulesInput = this.rulesForm.querySelector(`.rules__input`);
+    this.rulesButton = this.rulesForm.querySelector(`.rules__button`);
+
+    this.rulesInput.addEventListener(`input`, this._onInputChangeHandler);
+    this.rulesForm.addEventListener(`submit`, this._onContinueButtonClickHandler);
+    this.backButton.addEventListener(`click`, this._onBackButtonClickHandler);
   }
 
   onContinueButtonClick(userName) {

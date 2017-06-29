@@ -1,26 +1,50 @@
 
-export const rules = Object.freeze({
+export const Result = Object.freeze({
+  CORRECT: `correct`,
+  WRONG: `wrong`,
+  FAST: `fast`,
+  SLOW: `slow`,
+  UNKNOWN: `unknown`
+});
+
+export const rules = {
   gameTime: 30,
+  warningTime: 5,
   slowTime: 20,
   quickTime: 10,
-  points: Object.freeze({
-    correct: 100,
-    fast: 50,
-    slow: -50,
-    wrong: 0,
-    unknown: 0,
-    heart: 50
-  }),
+  points: {
+    [Result.CORRECT]: 100,
+    [Result.WRONG]: 0,
+    [Result.FAST]: 100,
+    [Result.SLOW]: 100,
+    [Result.UNKNOWN]: 0
+  },
+  extra: [{
+    key: `fast`,
+    label: `Бонус за скорость:`,
+    points: 50,
+    count: (data) => countValue(data.stats, Result.FAST)
+  }, {
+    key: `heart`,
+    label: `Бонус за жизни:`,
+    points: 50,
+    count: (data) => data.lives
+  }, {
+    key: `slow`,
+    label: `Штраф за медлительность:`,
+    points: -50,
+    count: (data) => countValue(data.stats, Result.SLOW)
+  }],
   maxLives: 3,
   levelsCount: 10
-});
+};
 
 export const state = Object.freeze({
   level: 0,
   levels: [],
   lives: rules.maxLives,
   name: `Unknown`,
-  results: Object.freeze(new Array(rules.levelsCount).fill(`unknown`))
+  results: Object.freeze(new Array(rules.levelsCount).fill(Result.UNKNOWN))
 });
 
 export const typeOptions = {
@@ -38,79 +62,54 @@ export const typeOptions = {
   }
 };
 
-export function renderScreen(screen) {
-
-  const viewport = document.getElementById(`main`);
-
-  viewport.innerHTML = ``;
-  viewport.appendChild(screen.element);
-}
-
-export function countResults(results, value) {
-  return results.filter((result) => result === value).length;
+export function countValue(arr, value) {
+  return arr.filter((item) => item === value).length;
 }
 
 export function getLevelResult(levelTime, levelPassed) {
 
+  let result = Result.UNKNOWN;
+
   if (!levelPassed || levelTime < 0) {
-    return `wrong`;
+    result = Result.WRONG;
   } else if (levelPassed && levelTime < rules.quickTime) {
-    return `fast`;
+    result = Result.FAST;
   } else if (levelPassed && levelTime > rules.slowTime) {
-    return `slow`;
+    result = Result.SLOW;
   } else if (levelPassed) {
-    return `correct`;
+    result = Result.CORRECT;
   } else {
-    return `wrong`;
+    result = Result.WRONG;
   }
+
+  return result;
 }
 
-export function getLivesCount(results) {
+export function getPoints(stats) {
 
-  const lives = rules.maxLives - countResults(results, `wrong`);
-
-  return (lives < 0) ? 0 : lives;
+  return stats.reduce((sum, value) => {
+    return sum + rules.points[value];
+  }, 0);
 }
 
-export function getPoints(results) {
-  return results.filter((result) => {
-    return Math.abs(rules.points[result]);
-  }).length * rules.points.correct;
-}
+export function getExtraPoints(data) {
 
-
-const extraPoints = {
-  fast: `Бонус за скорость:`,
-  heart: `Бонус за жизни:`,
-  slow: `Штраф за медлительность:`
-};
-
-export function getTotalPoints(results) {
-  return getPoints(results) + Object.keys(extraPoints).map((key) => {
-
-    const keyCount = (key === `heart`)
-      ? getLivesCount(results)
-      : countResults(results, key);
-
-    return keyCount * rules.points[key];
-
-  }).reduce((pValue, cValue) => pValue + cValue);
-}
-
-export function getExtraPointsList(results) {
-
-  return Object.keys(extraPoints).map((key) => {
-
-    const keyCount = (key === `heart`)
-      ? getLivesCount(results)
-      : countResults(results, key);
-
+  return rules.extra.map((item) => {
     return {
-      name: key,
-      title: extraPoints[key],
-      count: keyCount,
-      points: Math.abs(rules.points[key]),
-      totalPoints: keyCount * rules.points[key]
+      key: item.key,
+      label: item.label,
+      count: item.count(data),
+      points: Math.abs(item.points),
+      total: item.count(data) * item.points
     };
   });
+}
+
+export function getTotalPoints(data) {
+
+  const extraPoints = rules.extra.reduce((sum, item) => {
+    return sum + item.points * item.count(data);
+  }, 0);
+
+  return getPoints(data.stats) + extraPoints;
 }

@@ -1,5 +1,5 @@
 
-import {typeOptions} from './data';
+import {typeOptions} from '../data/data';
 import {loadImage} from '../utils';
 import {DefaultAdapter} from '../adapter';
 
@@ -10,19 +10,20 @@ export default new class extends DefaultAdapter {
 
     const imageLoaders = [];
 
-    data.forEach((item) => {
+    for (const item of data) {
 
       item.formClass = typeOptions[item.type].formClass;
       item.hasAnswers = typeOptions[item.type].hasAnswers;
 
-      item.answers.forEach((answer) => {
+      for (const answer of item.answers) {
 
-        imageLoaders.push(loadImage(answer.image.url)
-          .then((img) => {
-            answer.image.img = img;
-          }));
-      });
-    });
+        const loader = loadImage(answer.image.url).then((img) => {
+          answer.image.tag = img;
+        });
+
+        imageLoaders.push(loader);
+      }
+    }
 
     return Promise.all(imageLoaders).then(() => data);
   }

@@ -23,7 +23,7 @@ export function loadImage(src) {
     let timeout = null;
 
     const img = new Image();
-    const TIMEOUT_DELAY = 8000;
+    const LOAD_TIMEOUT = 10000;
 
     img.onload = () => {
       clearTimeout(timeout);
@@ -41,71 +41,8 @@ export function loadImage(src) {
       img.src = ``;
       reject(new Error(`Loading timeout of image [${src}] is expired`));
 
-    }, TIMEOUT_DELAY);
+    }, LOAD_TIMEOUT);
 
     img.src = src;
-  });
-}
-
-export function loadImages(sources) {
-
-  const images = [];
-
-  sources.forEach((src) => {
-    images.push(loadImage(src));
-  });
-
-  return Promise.all(images);
-}
-
-export function _loadImage(src, onLoadCompleted) {
-
-  let timeout = null;
-
-  const img = new Image();
-  const TIMEOUT_DELAY = 5000;
-
-  img.addEventListener(`load`, () => {
-    clearTimeout(timeout);
-
-    if (typeof onLoadCompleted === `function`) {
-      onLoadCompleted(img);
-    }
-  });
-
-  img.addEventListener(`error`, () => {
-    clearTimeout(timeout);
-
-    img.src = ``;
-
-    if (typeof onLoadCompleted === `function`) {
-      onLoadCompleted(img);
-    }
-  });
-
-  timeout = setTimeout(() => {
-    img.src = ``;
-  }, TIMEOUT_DELAY);
-
-  img.src = src;
-}
-
-export function _loadImages(srcArray, onLoadCompleted) {
-
-  const imgs = [];
-
-  let count = srcArray.length;
-
-  srcArray.forEach((src, index) => {
-
-    _loadImage(src, (img) => {
-
-      imgs[index] = img;
-      count--;
-
-      if (!count && typeof onLoadCompleted === `function`) {
-        onLoadCompleted(imgs);
-      }
-    });
   });
 }

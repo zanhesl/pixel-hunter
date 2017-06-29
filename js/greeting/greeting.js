@@ -1,5 +1,4 @@
 
-import {renderScreen} from '../data/data';
 import GreetingView from './greeting-view';
 import Application from '../application';
 
@@ -9,9 +8,18 @@ class GreetingPresenter {
     this.view = new GreetingView();
   }
 
-  init() {
+  get element() {
+    return this.view.element;
+  }
 
-    renderScreen(this.view);
+  destroy() {
+    this.view.onContinueButtonClick = null;
+    this.view.remove();
+  }
+
+  show(viewport) {
+
+    this.view.show(viewport);
 
     this.view.onContinueButtonClick = () => {
       Application.showRules();
@@ -19,6 +27,4 @@ class GreetingPresenter {
   }
 }
 
-const instance = new GreetingPresenter();
-
-export default () => instance;
+export default () => new GreetingPresenter();

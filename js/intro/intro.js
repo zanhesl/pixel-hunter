@@ -1,5 +1,4 @@
 
-import {renderScreen} from '../data/data';
 import IntroView from './intro-view';
 
 
@@ -8,11 +7,17 @@ class IntroPresenter {
     this.view = new IntroView();
   }
 
-  init() {
-    renderScreen(this.view);
+  get element() {
+    return this.view.element;
+  }
+
+  destroy() {
+    this.view.remove();
+  }
+
+  show(viewport) {
+    this.view.show(viewport);
   }
 }
 
-const instance = new IntroPresenter();
-
-export default () => instance;
+export default () => new IntroPresenter();

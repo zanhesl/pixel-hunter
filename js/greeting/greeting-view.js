@@ -4,6 +4,11 @@ import footer from '../footer';
 
 
 export default class GreetingView extends AbstractView {
+  constructor() {
+    super();
+
+    this._onContinueButtonClickHandler = this._onContinueButtonClickHandler.bind(this);
+  }
 
   get template() {
     return `\
@@ -23,14 +28,20 @@ export default class GreetingView extends AbstractView {
       ${footer()}`;
   }
 
+  _onContinueButtonClickHandler(evt) {
+    evt.preventDefault();
+    this.onContinueButtonClick();
+  }
+
+  remove() {
+    this._greetingContinue.removeEventListener(`click`, this._onContinueButtonClickHandler);
+    super.remove();
+  }
+
   bind() {
+    this._greetingContinue = this.element.querySelector(`.greeting__continue`);
 
-    const greetingContinue = this.element.querySelector(`.greeting__continue`);
-
-    greetingContinue.addEventListener(`click`, (evt) => {
-      evt.preventDefault();
-      this.onContinueButtonClick();
-    });
+    this._greetingContinue.addEventListener(`click`, this._onContinueButtonClickHandler);
   }
 
   onContinueButtonClick() {

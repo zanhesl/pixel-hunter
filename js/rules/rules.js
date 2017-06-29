@@ -1,5 +1,4 @@
 
-import {renderScreen} from '../data/data';
 import RulesView from './rules-view';
 import Application from '../application';
 
@@ -9,9 +8,19 @@ class RulesPresenter {
     this.view = new RulesView();
   }
 
-  init() {
+  get element() {
+    return this.view.element;
+  }
 
-    renderScreen(this.view);
+  destroy() {
+    this.view.onContinueButtonClick = null;
+    this.view.onBackButtonClick = null;
+    this.view.remove();
+  }
+
+  show(viewport) {
+
+    this.view.show(viewport);
 
     this.view.onContinueButtonClick = (userName) => {
       Application.showGame({name: userName});

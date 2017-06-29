@@ -15,6 +15,14 @@
   top: 25px;
   left: 50%;
   transform: translateX(-50%);
+
+  &--blink {
+    animation: blink;
+    animation-duration: 0.5s;
+    animation-direction: alternate;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
 }
 
 .game__lives {
@@ -119,10 +127,13 @@
 }
 
 .game__content--triple .game__option {
+  position: relative;
   cursor: pointer;
 
   width: 304px;
   height: 455px;
+
+  z-index: 10;
 
   &:hover {
     border-color: #df4e4e;
@@ -138,7 +149,20 @@
     height: 100%;
 
     background-color: rgba(223, 78, 78, 0.4);
-    z-index: 1;
+    //z-index: 1;
   }
 
+  &::after {
+    z-index: 1;
+  }
+}
+
+
+@keyframes blink {
+  from {
+    opacity: 1.0;
+  }
+  to {
+    opacity: 0.0;
+  }
 }
