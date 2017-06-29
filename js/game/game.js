@@ -5,7 +5,7 @@ import {getLevelResult} from '../data/data';
 import {state as initState} from '../data/data';
 import {rules} from '../data/data';
 import GameView from './game-view';
-import viewConfirm from './confirm-view';
+import ConfirmView from './confirm-view';
 import Application from '../application';
 
 
@@ -25,7 +25,7 @@ class GamePresenter {
 
     this._viewGame = new GameView(this._state, this._level);
 
-    this._viewConfirm = new viewConfirm();
+    this._viewConfirm = new ConfirmView();
 
     this._onTimeTickHandler = this._onTimeTickHandler.bind(this);
   }
