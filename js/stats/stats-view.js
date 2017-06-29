@@ -32,11 +32,11 @@ export default class StatsView extends AbstractView {
   }
 
   _isGameFailed(userID) {
-    return (this.data[userID].lives < 0);
+    return (this.data[userID].lives === 0);
   }
 
   _templateExtra(extra) {
-    return (extra.count <= 0) ? `` : `\
+    return (extra.count === 0) ? `` : `\
       <tr>
         <td></td>
         <td class="result__extra">${extra.label}</td>

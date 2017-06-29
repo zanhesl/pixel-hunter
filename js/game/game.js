@@ -98,7 +98,7 @@ class GamePresenter {
 
   _nextGame() {
 
-    if ((this.state.lives >= 0) && ((this.state.level + 1) < gameModel.levelsCount)) {
+    if ((this.state.lives > 0) && ((this.state.level + 1) < gameModel.levelsCount)) {
 
       this.level = gameModel.getLevel(++this.state.level);
 
