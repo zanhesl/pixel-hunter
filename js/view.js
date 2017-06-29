@@ -29,6 +29,10 @@ export default class AbstractView {
     parentNode.appendChild(this.element);
   }
 
+  hide() {
+    this.element.parentNode.removeChild(this.element);
+  }
+
   remove() {
     this.element.parentNode.removeChild(this.element);
   }

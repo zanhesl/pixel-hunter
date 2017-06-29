@@ -5,11 +5,14 @@ import {getLevelResult} from '../data/data';
 import {state as initState} from '../data/data';
 import {rules} from '../data/data';
 import GameView from './game-view';
+import viewConfirm from './confirm-view';
 import Application from '../application';
 
 
 class GamePresenter {
   constructor(userName) {
+
+    this.TIMER_DELAY = 1000;
 
     this.state = Object.assign({}, initState, {
       name: userName,
@@ -20,44 +23,58 @@ class GamePresenter {
 
     this.level = gameModel.getLevel(this.state.level);
 
-    this.view = new GameView(this.state, this.level);
+    this.viewGame = new GameView(this.state, this.level);
+
+    this.viewConfirm = new viewConfirm();
 
     this._onTimeTickHandler = this._onTimeTickHandler.bind(this);
   }
 
   get element() {
-    return this.view.element;
+    return this.viewGame.element;
   }
 
   destroy() {
     clearInterval(this.gameTimer);
 
-    this.view.onAnswered = null;
-    this.view.onChosen = null;
-    this.view.onBackButtonClick = null;
-    this.view.remove();
+    this.viewGame.onAnswered = null;
+    this.viewGame.onChosen = null;
+    this.viewGame.onBackButtonClick = null;
+    this.viewConfirm.onConfirm = null;
+    this.viewGame.remove();
   }
 
   show(viewport = this.viewport) {
 
     this.viewport = viewport;
 
-    this.view.show(viewport);
+    this.viewGame.show(viewport);
 
-    this.view.onAnswered = (time, answers) => {
+    this.viewGame.onAnswered = (time, answers) => {
       this._endGame(rules.gameTime - time, this._isQuestionsAnswerRight(answers));
     };
 
-    this.view.onChosen = (time, answer) => {
+    this.viewGame.onChosen = (time, answer) => {
       this._endGame(rules.gameTime - time, this._isChoosenAnswerRight(answer));
     };
 
-    this.view.onBackButtonClick = () => {
-
-      // if (confirm(`Вы действительно хотите закончить игру?`)) {
+    this.viewGame.onBackButtonClick = () => {
       clearInterval(this.gameTimer);
-      Application.showGreeting();
-      // }
+
+      this.viewGame.hide();
+      this.viewConfirm.show(this.viewport);
+    };
+
+    this.viewConfirm.onConfirm = (result) => {
+
+      this.viewConfirm.hide();
+      this.viewGame.show(viewport);
+
+      if (result) {
+        Application.showGreeting();
+      } else {
+        this.gameTimer = setInterval(this._onTimeTickHandler, this.TIMER_DELAY);
+      }
     };
 
     this._startGame();
@@ -65,20 +82,18 @@ class GamePresenter {
 
   _onTimeTickHandler() {
 
-    if (this.view.gameTime <= 0) {
+    if (this.viewGame.gameTime <= 0) {
       this._endGame();
     } else {
-      this.view.gameTime = this.view.gameTime - 1;
+      this.viewGame.gameTime = this.viewGame.gameTime - 1;
     }
   }
 
   _startGame() {
 
-    const TIMER_DELAY = 1000;
+    this.viewGame.gameTime = rules.gameTime - 1;
 
-    this.view.gameTime = rules.gameTime - 1;
-
-    this.gameTimer = setInterval(this._onTimeTickHandler, TIMER_DELAY);
+    this.gameTimer = setInterval(this._onTimeTickHandler, this.TIMER_DELAY);
   }
 
   _endGame(time = 0, passed = false) {
@@ -104,7 +119,7 @@ class GamePresenter {
 
       this.destroy();
 
-      this.view = new GameView(this.state, this.level);
+      this.viewGame = new GameView(this.state, this.level);
 
       this.show();
 
