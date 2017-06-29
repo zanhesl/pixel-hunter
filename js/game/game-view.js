@@ -135,18 +135,12 @@ export default class GameView extends AbstractView {
     for (const answer of answers) {
       answer.disabled = true;
     }
-
-    if (this._isAnswered()) {
-      this.onAnswered(this.gameTime, this._getAnswers());
-    }
   }
 
   _onOptionClickHandler(evt) {
 
-    const LEFT_MOUSE_BUTTON = 1;
-
-    if (evt.which !== LEFT_MOUSE_BUTTON) {
-      return;
+    if (this._hasAnswers && this._isAnswered()) {
+      this.onAnswered(this.gameTime, this._getAnswers());
     }
 
     if (!this._hasAnswers) {
@@ -169,7 +163,7 @@ export default class GameView extends AbstractView {
     }
 
     for (const option of this._gameOptions) {
-      option.removeEventListener(`mouseup`, this._onOptionClickHandler);
+      option.removeEventListener(`click`, this._onOptionClickHandler);
     }
 
     this._backButton.removeEventListener(`click`, this._onBackButtonClickHandler);
@@ -201,7 +195,7 @@ export default class GameView extends AbstractView {
         this._addAnswerChangeHandlers();
       }
 
-      option.addEventListener(`mouseup`, this._onOptionClickHandler, true);
+      option.addEventListener(`click`, this._onOptionClickHandler, true);
     }
 
     this._backButton.addEventListener(`click`, this._onBackButtonClickHandler);
