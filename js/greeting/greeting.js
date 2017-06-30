@@ -5,23 +5,23 @@ import Application from '../application';
 
 class GreetingPresenter {
   constructor() {
-    this.view = new GreetingView();
+    this._view = new GreetingView();
   }
 
   get element() {
-    return this.view.element;
+    return this._view.element;
   }
 
   destroy() {
-    this.view.onContinueButtonClick = null;
-    this.view.remove();
+    this._view.onContinueButtonClick = null;
+    this._view.remove();
   }
 
   show(viewport) {
 
-    this.view.show(viewport);
+    this._view.show(viewport);
 
-    this.view.onContinueButtonClick = () => {
+    this._view.onContinueButtonClick = () => {
       Application.showRules();
     };
   }

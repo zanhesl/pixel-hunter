@@ -37,18 +37,18 @@ export default class RulesView extends AbstractView {
   }
 
   _getUserName() {
-    return this.rulesInput.value.replace(/[#//]/g, ``).trim();
+    return this._rulesInput.value.replace(/[#//]/g, ``).trim();
   }
 
   _onInputChangeHandler() {
-    this.rulesButton.disabled = (this._getUserName().length === 0);
+    this._rulesButton.disabled = (this._getUserName().length === 0);
   }
 
   _onContinueButtonClickHandler(evt) {
     evt.preventDefault();
 
-    this.rulesInput.disabled = true;
-    this.rulesButton.disabled = true;
+    this._rulesInput.disabled = true;
+    this._rulesButton.disabled = true;
 
     this.onContinueButtonClick(this._getUserName());
   }
@@ -59,23 +59,23 @@ export default class RulesView extends AbstractView {
   }
 
   remove() {
-    this.rulesInput.removeEventListener(`input`, this._onInputChangeHandler);
-    this.rulesForm.removeEventListener(`submit`, this._onContinueButtonClickHandler);
-    this.backButton.removeEventListener(`click`, this._onBackButtonClickHandler);
+    this._rulesInput.removeEventListener(`input`, this._onInputChangeHandler);
+    this._rulesForm.removeEventListener(`submit`, this._onContinueButtonClickHandler);
+    this._backButton.removeEventListener(`click`, this._onBackButtonClickHandler);
     super.remove();
   }
 
   bind() {
 
-    this.backButton = this.element.querySelector(`.header__back`);
-    this.rulesForm = this.element.querySelector(`.rules__form`);
+    this._backButton = this.element.querySelector(`.header__back`);
+    this._rulesForm = this.element.querySelector(`.rules__form`);
 
-    this.rulesInput = this.rulesForm.querySelector(`.rules__input`);
-    this.rulesButton = this.rulesForm.querySelector(`.rules__button`);
+    this._rulesInput = this._rulesForm.querySelector(`.rules__input`);
+    this._rulesButton = this._rulesForm.querySelector(`.rules__button`);
 
-    this.rulesInput.addEventListener(`input`, this._onInputChangeHandler);
-    this.rulesForm.addEventListener(`submit`, this._onContinueButtonClickHandler);
-    this.backButton.addEventListener(`click`, this._onBackButtonClickHandler);
+    this._rulesInput.addEventListener(`input`, this._onInputChangeHandler);
+    this._rulesForm.addEventListener(`submit`, this._onContinueButtonClickHandler);
+    this._backButton.addEventListener(`click`, this._onBackButtonClickHandler);
   }
 
   onContinueButtonClick(userName) {

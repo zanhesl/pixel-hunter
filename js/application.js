@@ -18,18 +18,18 @@ const PresenterID = {
 class Application {
   constructor() {
 
-    this.viewport = document.getElementById(`main`);
+    this._viewport = document.getElementById(`main`);
 
-    this.presenter = introPresenter();
+    this._presenter = introPresenter();
 
-    this.routes = {
+    this._routes = {
       [PresenterID.GREETING]: greetingPresenter,
       [PresenterID.RULES]: rulesPresenter,
       [PresenterID.GAME]: gamePresenter,
       [PresenterID.STATS]: statsPresenter,
     };
 
-    this.render = {
+    this._render = {
       [PresenterID.GREETING]: this._renderFadeAnimationScreen,
       [PresenterID.RULES]: this._renderScreen,
       [PresenterID.GAME]: this._renderScreen,
@@ -78,12 +78,12 @@ class Application {
 
   _changePresenter(hash) {
 
-    const newPresenter = this.routes[hash.route](hash.args);
-    const renderFunction = this.render[hash.route];
+    const newPresenter = this._routes[hash.route](hash.args);
+    const renderFunction = this._render[hash.route];
 
-    renderFunction(this.presenter, newPresenter, this.viewport);
+    renderFunction(this._presenter, newPresenter, this._viewport);
 
-    this.presenter = newPresenter;
+    this._presenter = newPresenter;
   }
 
   _renderScreen(oldPresenter, newPresenter, viewport) {
@@ -113,7 +113,7 @@ class Application {
   }
 
   init() {
-    this.presenter.show(this.viewport);
+    this._presenter.show(this._viewport);
   }
 
   showGreeting() {

@@ -9,12 +9,12 @@ import statsAdapter from '../models/stats-adapter';
 class StatsPresenter {
   constructor(userName, lives, results) {
 
-    this.lives = lives;
-    this.results = results;
+    this._lives = lives;
+    this._results = results;
 
-    this.view = new IntroView();
+    this._view = new IntroView();
 
-    this.model = new class extends Model {
+    this._model = new class extends Model {
       constructor(name) {
         super();
 
@@ -32,29 +32,29 @@ class StatsPresenter {
   }
 
   get element() {
-    return this.view.element;
+    return this._view.element;
   }
 
   destroy() {
-    this.view.onBackButtonClick = null;
-    this.view.remove();
+    this._view.onBackButtonClick = null;
+    this._view.remove();
   }
 
   show(viewport) {
 
-    this.view.show(viewport);
+    this._view.show(viewport);
 
-    this.model.send({stats: this.results, lives: this.lives}, statsAdapter).then(() => {
+    this._model.send({stats: this._results, lives: this._lives}, statsAdapter).then(() => {
 
-      this.model.load(statsAdapter).then((data) => {
+      this._model.load(statsAdapter).then((data) => {
 
-        this.view.remove();
+        this._view.remove();
 
-        this.view = new StatsView(data);
+        this._view = new StatsView(data);
 
-        this.view.show(viewport);
+        this._view.show(viewport);
 
-        this.view.onBackButtonClick = () => {
+        this._view.onBackButtonClick = () => {
           Application.showGreeting();
         };
 

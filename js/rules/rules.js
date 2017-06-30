@@ -5,28 +5,28 @@ import Application from '../application';
 
 class RulesPresenter {
   constructor() {
-    this.view = new RulesView();
+    this._view = new RulesView();
   }
 
   get element() {
-    return this.view.element;
+    return this._view.element;
   }
 
   destroy() {
-    this.view.onContinueButtonClick = null;
-    this.view.onBackButtonClick = null;
-    this.view.remove();
+    this._view.onContinueButtonClick = null;
+    this._view.onBackButtonClick = null;
+    this._view.remove();
   }
 
   show(viewport) {
 
-    this.view.show(viewport);
+    this._view.show(viewport);
 
-    this.view.onContinueButtonClick = (userName) => {
+    this._view.onContinueButtonClick = (userName) => {
       Application.showGame({name: userName});
     };
 
-    this.view.onBackButtonClick = () => {
+    this._view.onBackButtonClick = () => {
       Application.showGreeting();
     };
   }
