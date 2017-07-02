@@ -13,7 +13,4 @@ export default new class extends DefaultAdapter {
     });
   }
 
-  toServer(data) {
-    return data;
-  }
 }();
