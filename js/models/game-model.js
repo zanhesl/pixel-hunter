@@ -4,9 +4,6 @@ import gameAdapter from './game-adapter';
 
 
 class GameModel extends Model {
-  contructor() {
-    this._data = [];
-  }
 
   get urlRead() {
     return `https://intensive-ecmascript-server-btfgudlkpi.now.sh/pixel-hunter/questions`;

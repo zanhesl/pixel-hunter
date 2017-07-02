@@ -41,7 +41,6 @@ export const rules = {
 
 export const state = Object.freeze({
   level: 0,
-  levels: [],
   lives: rules.maxLives,
   name: `Unknown`,
   results: Object.freeze(new Array(rules.levelsCount).fill(Result.UNKNOWN))
